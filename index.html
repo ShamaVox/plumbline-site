@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plumbline · Quality monitoring for AI agents</title>
+<meta name="description" content="Plumbline watches AI agents in production. When quality slips, it tells your team and names the likely cause: the prompt version, the failing step, the deploy.">
+<!-- Link previews (LinkedIn, Slack, X). Replace SITE_URL with your GitHub Pages address, e.g. https://your-name.github.io/plumbline-site -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Plumbline: know when your AI agent gets worse, and why">
+<meta property="og:description" content="Quality monitoring for AI agents in production. Alerts that name the likely cause: the prompt version, the failing step, the deploy.">
+<meta property="og:url" content="SITE_URL/">
+<meta property="og:image" content="SITE_URL/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#15202b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cline x1='16' y1='2' x2='16' y2='14' stroke='%239a6418' stroke-width='2.5'/%3E%3Cpath d='M8 14h16l-8 16z' fill='%239a6418'/%3E%3C/svg%3E">
+<style>html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one plumb line drops through the page; each section hangs off it, the thesis at the top, early access at the bottom. */
+:root {
+  --bg: #f4f6f7;
+  --surface: #ffffff;
+  --ink: #15202b;
+  --ink-2: #4a5866;
+  --line: rgba(21, 32, 43, 0.12);
+  --brass: #9a6418;
+  --brass-soft: rgba(154, 100, 24, 0.10);
+  --critical: #c23a2b;
+  --good: #1d7a46;
+  --code-bg: #eef1f3;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f161c; --surface: #16212a; --ink: #e7ecef; --ink-2: #9fb0bd; --line: rgba(231, 236, 239, 0.12);
+    --brass: #d9a24f; --brass-soft: rgba(217, 162, 79, 0.12); --critical: #ef6f5f; --good: #4cc483; --code-bg: #121b22;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f161c; --surface: #16212a; --ink: #e7ecef; --ink-2: #9fb0bd; --line: rgba(231, 236, 239, 0.12);
+  --brass: #d9a24f; --brass-soft: rgba(217, 162, 79, 0.12); --critical: #ef6f5f; --good: #4cc483; --code-bg: #121b22;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+a { color: inherit; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: var(--gutter); padding-right: var(--gutter-r); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.4rem, 6.4vw, 4.6rem); font-weight: 820; font-stretch: 112%; line-height: 1.02; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.7rem, 3.6vw, 2.5rem); font-weight: 780; font-stretch: 108%; line-height: 1.1; letter-spacing: -0.01em; }
+h3 { font-size: 1.2rem; font-weight: 700; font-stretch: 100%; line-height: 1.25; }
+p { margin: 0; max-width: 65ch; }
+.label { font-family: var(--display); font-stretch: 125%; font-weight: 700; font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+.lede { font-size: 1.2rem; color: var(--ink-2); }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+
+/* Header */
+header.top { border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; flex-wrap: wrap; }
+.mark { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 800; font-stretch: 118%; font-size: 1.25rem; text-decoration: none; letter-spacing: -0.01em; }
+.mark svg { width: 18px; height: 26px; }
+nav.links { display: flex; gap: 22px; flex-wrap: wrap; font-size: 0.95rem; }
+nav.links a { text-decoration: none; color: var(--ink-2); }
+nav.links a:hover { color: var(--ink); }
+
+/* Buttons */
+.cta { display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--bg); text-decoration: none; font-weight: 700; padding: 13px 22px; border-radius: 999px; font-size: 1rem; border: 0; cursor: pointer; }
+.cta:hover { background: var(--brass); color: #fff; }
+.cta.soon { background: transparent; color: var(--ink-2); border: 1px dashed var(--line); cursor: default; }
+.ghost { color: var(--ink); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--brass); padding-bottom: 2px; }
+
+/* Hero: the line and the bob */
+.hero { position: relative; padding-block: clamp(48px, 8vw, 96px) clamp(40px, 6vw, 72px); }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(32px, 5vw, 64px); align-items: start; }
+.hero-copy { display: grid; gap: 22px; position: relative; padding-left: 44px; }
+.plumb { position: absolute; left: 6px; top: -120px; bottom: 0; width: 28px; pointer-events: none; }
+.plumb .string { position: absolute; left: 13px; top: 0; bottom: 34px; width: 1.5px; background: var(--brass); opacity: 0.75; }
+.plumb .bob { position: absolute; left: 3px; bottom: 0; width: 22px; height: 34px; }
+.plumb-swing { position: absolute; inset: 0; transform-origin: 14px 0; animation: settle 2.6s cubic-bezier(.2,.7,.2,1) 0.2s both; }
+@keyframes settle { 0% { transform: rotate(7deg); } 30% { transform: rotate(-4deg); } 55% { transform: rotate(2deg); } 78% { transform: rotate(-0.8deg); } 100% { transform: rotate(0deg); } }
+@media (prefers-reduced-motion: reduce) { .plumb-swing { animation: none; } }
+.hero-actions { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.hero-note { font-size: 0.92rem; color: var(--ink-2); }
+
+/* The example alert, as a message would arrive */
+.message { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 18px 50px -24px rgba(21, 32, 43, 0.35); overflow: hidden; min-width: 0; }
+.message .head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-size: 0.85rem; color: var(--ink-2); flex-wrap: wrap; }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; background: var(--critical); margin-right: 8px; vertical-align: 1px; }
+.dot.brass { background: var(--brass); }
+.message .body { padding: 18px; display: grid; gap: 12px; }
+.message .title { font-weight: 700; font-size: 1.05rem; }
+.message .cause { font-family: var(--mono); font-size: 0.84rem; line-height: 1.6; background: var(--code-bg); border-radius: 8px; padding: 14px; color: var(--ink); overflow-wrap: anywhere; }
+.message .cause b { color: var(--brass); font-weight: 600; }
+.message .meta { font-size: 0.82rem; color: var(--ink-2); }
+.example-tag { font-family: var(--display); font-stretch: 125%; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px; }
+
+/* Sections */
+section { padding-block: clamp(56px, 8vw, 96px); border-top: 1px solid var(--line); }
+.section-head { display: grid; gap: 14px; margin-bottom: 40px; }
+.problem p + p { margin-top: 18px; }
+.problem .big { font-family: var(--display); font-stretch: 104%; font-size: clamp(1.4rem, 2.8vw, 1.9rem); font-weight: 600; line-height: 1.3; max-width: 34ch; }
+
+.catches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); }
+.catch { padding: 28px 28px 30px 0; display: grid; gap: 10px; border-bottom: 1px solid var(--line); align-content: start; }
+.catch:nth-child(odd) { border-right: 1px solid var(--line); }
+.catch:nth-child(even) { padding-left: 28px; padding-right: 0; }
+.catch .what { font-family: var(--mono); font-size: 0.8rem; color: var(--brass); }
+.catch p { color: var(--ink-2); }
+
+.watcher { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 56px); align-items: center; }
+.note-list { margin: 0; padding-left: 20px; display: grid; gap: 12px; font-size: 0.95rem; }
+.note-list li::marker { color: var(--brass); font-weight: 700; }
+.fact { display: block; font-family: var(--mono); font-size: 0.78rem; color: var(--ink-2); margin-top: 4px; }
+
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; counter-reset: step; }
+.steps li { display: grid; gap: 10px; align-content: start; counter-increment: step; }
+.steps li::before { content: counter(step); font-family: var(--display); font-stretch: 125%; font-weight: 800; font-size: 0.9rem; color: var(--brass); width: 34px; height: 34px; border: 1.5px solid var(--brass); border-radius: 50%; display: grid; place-items: center; }
+.steps p { color: var(--ink-2); font-size: 0.98rem; }
+.snippet { margin-top: 36px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; overflow-x: auto; }
+.snippet pre { margin: 0; font-family: var(--mono); font-size: 0.85rem; line-height: 1.7; color: var(--ink); }
+.snippet .c { color: var(--ink-2); }
+
+.stack { display: flex; flex-wrap: wrap; gap: 10px 10px; margin-top: 8px; padding: 0; list-style: none; }
+.stack li { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 0.92rem; background: var(--surface); }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(28px, 5vw, 56px); }
+.two > div { display: grid; gap: 14px; align-content: start; }
+.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.checks li { padding-left: 22px; position: relative; color: var(--ink-2); }
+.checks li::before { content: ""; position: absolute; left: 0; top: 0.7em; width: 10px; height: 1.5px; background: var(--brass); }
+
+.access { text-align: left; }
+.access .box { border: 1.5px solid var(--ink); border-radius: 18px; padding: clamp(28px, 5vw, 48px); display: grid; gap: 18px; background: var(--surface); }
+.access .box p { color: var(--ink-2); }
+footer { padding-block: 32px 48px; border-top: 1px solid var(--line); color: var(--ink-2); font-size: 0.88rem; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+/* Pricing */
+.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px 22px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.plan.pick { border: 1.5px solid var(--brass); box-shadow: 0 18px 50px -30px rgba(154, 100, 24, 0.55); }
+.plan .name { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.plan .tag { font-family: var(--display); font-stretch: 125%; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass); }
+.price { font-family: var(--display); font-weight: 820; font-stretch: 108%; font-size: 2.3rem; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.price small { font-family: var(--body); font-size: 0.9rem; font-weight: 400; color: var(--ink-2); letter-spacing: 0; }
+.plan .for { color: var(--ink-2); font-size: 0.93rem; }
+.plan ul { list-style: none; margin: 0; padding: 14px 0 0; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: 0.93rem; }
+.plan li { padding-left: 18px; position: relative; }
+.plan li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 8px; height: 1.5px; background: var(--brass); }
+.usage { margin-top: 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.usage div { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 4px; }
+.usage b { font-family: var(--display); font-stretch: 108%; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.usage span { color: var(--ink-2); font-size: 0.92rem; }
+.founding { margin-top: 28px; border: 1px dashed var(--brass); background: var(--brass-soft); border-radius: 12px; padding: 18px 20px; display: flex; gap: 12px 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.founding p { max-width: 70ch; }
+
+@media (max-width: 860px) {
+  .hero .wrap, .watcher, .two { grid-template-columns: minmax(0, 1fr); }
+  .steps { grid-template-columns: minmax(0, 1fr); }
+  .catches { grid-template-columns: minmax(0, 1fr); }
+  .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .usage { grid-template-columns: minmax(0, 1fr); }
+  .catch, .catch:nth-child(even) { padding: 24px 0; border-right: 0; }
+  .catch:nth-child(odd) { border-right: 0; }
+  nav.links { gap: 16px; }
+}
+@media (max-width: 520px) {
+  nav.links a.hide-sm { display: none; }
+  .plans { grid-template-columns: minmax(0, 1fr); }
+  .hero-copy { padding-left: 34px; }
+  .plumb { left: 0; top: -16px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="#top" aria-label="Plumbline home">
+      <svg viewBox="0 0 18 26" aria-hidden="true"><line x1="9" y1="0" x2="9" y2="12" stroke="currentColor" stroke-width="1.6"/><path d="M4 12 h10 l-5 13 z" fill="var(--brass)"/></svg>
+      Plumbline
+    </a>
+    <nav class="links" aria-label="Sections">
+      <a href="#what-it-catches">What it catches</a>
+      <a href="#how-it-works" class="hide-sm">How it works</a>
+      <a href="#voice" class="hide-sm">Voice agents</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#early-access" class="hide-sm">Early access</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <div class="plumb" aria-hidden="true">
+          <div class="plumb-swing">
+            <div class="string"></div>
+            <svg class="bob" viewBox="0 0 22 34"><path d="M3 2 h16 l-8 30 z" fill="var(--brass)"/><rect x="2" y="0" width="18" height="4" rx="1" fill="var(--brass)"/></svg>
+          </div>
+        </div>
+        <span class="label">Quality monitoring for AI agents</span>
+        <h1>Know when your agent gets worse, and why.</h1>
+        <p class="lede">Plumbline watches your AI agents in production. When quality slips, it tells your team in Slack or email and names the likely cause: the prompt version, the failing step, the deploy.</p>
+        <div class="hero-actions">
+          <a class="cta" data-signup href="#early-access">Request early access</a>
+          <a class="ghost" href="#what-it-catches">See what it catches</a>
+        </div>
+        <p class="hero-note">Runs on your own Postgres. Set up in an afternoon.</p>
+      </div>
+
+      <figure class="message" aria-label="An example alert as it arrives in Slack" style="margin:0">
+        <div class="head"><span><span class="dot"></span>Critical · stylist-matcher · production</span><span class="example-tag">Example</span></div>
+        <div class="body">
+          <div class="title">Verified task success fell from 95% to 80%</div>
+          <div class="cause"><b>Likely cause:</b> started around Tue 14:00 UTC. Runs on prompt v8 fail 25% of the time, against 2% on other versions, and v8 first appeared then. Step send_shortlist started failing at the same time. Deploy "Matcher prompt rewrite" (prompt v8) went out 8 minutes before.</div>
+          <div class="meta">Each part passed a significance test. The 41 runs behind it are one click away.</div>
+        </div>
+      </figure>
+    </div>
+  </div>
+
+  <section class="problem">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">The problem</span>
+      </div>
+      <p class="big">AI agents rarely crash. They get quietly worse.</p>
+      <p style="margin-top:18px;color:var(--ink-2)">A prompt tweak, a model update from your provider or a new tool changes behaviour, and nothing errors. The agent still says it is done. Customers notice before your dashboards do, and then someone spends a day reading traces to work out which change did it.</p>
+      <p style="color:var(--ink-2)">Plumbline checks whether the job was really done, learns what normal looks like for each agent, and speaks up when that changes.</p>
+    </div>
+  </section>
+
+  <section id="what-it-catches">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">What it catches</span>
+        <h2>The failures that never throw an error.</h2>
+      </div>
+      <div class="catches">
+        <div class="catch">
+          <span class="what">likely cause</span>
+          <h3>The change that broke it</h3>
+          <p>Every alert says when the drop started, which prompt, model or code version the bad runs share, which step began failing and which deploy went out around then. Each part has to pass a significance test, or it is left out.</p>
+        </div>
+        <div class="catch">
+          <span class="what">run.false_completion_rate</span>
+          <h3>"Done" that wasn't</h3>
+          <p>Agents report success while the booking never happened. Plumbline compares what the agent claimed with an independent check: yours, or a judge model grading a sample of runs against your rubric.</p>
+        </div>
+        <div class="catch">
+          <span class="what">daily watcher note</span>
+          <h3>Drift below your alert lines</h3>
+          <p>Once a day it looks at what is odd but not yet alarming, such as a new version that fails more or a step that started failing, and posts a short note. Every number in it comes from your data.</p>
+        </div>
+        <div class="catch">
+          <span class="what">eval gate</span>
+          <h3>Regressions before they ship</h3>
+          <p>Run your eval suite in CI and block a prompt or model change that makes things worse, with the failing cases listed in the pull request.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap watcher">
+      <div class="section-head" style="margin:0">
+        <span class="label">The watcher</span>
+        <h2>A colleague who reads every dashboard.</h2>
+        <p style="color:var(--ink-2)">Founders and product leads get the note in Slack without opening anything. If you connect a model, it connects the findings and says what to check first. It can only cite what Plumbline found, and a point with a number that is not in the data is dropped.</p>
+      </div>
+      <figure class="message" aria-label="An example watcher note" style="margin:0">
+        <div class="head"><span><span class="dot brass"></span>2 things worth a look in the last day</span><span class="example-tag">Example</span></div>
+        <div class="body">
+          <ol class="note-list">
+            <li>Prompt v9 possibly broke booking: its runs fail 25% against 8.3% on other versions, and book_slot failed 24 times. Check the v9 deploy first.
+              <span class="fact">matcher started running prompt v9: 96 checked runs so far, 25% failed against 8.3% on other versions.</span></li>
+            <li>Spend was $6.24, against $2.40 in the same hours a week earlier.
+              <span class="fact">160% more, with no change in traffic.</span></li>
+          </ol>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">How it works</span>
+        <h2>Three steps, most of them automatic.</h2>
+      </div>
+      <ol class="steps">
+        <li><h3>Connect your agent</h3><p>Point your framework's tracing at Plumbline, or add a few lines with the TypeScript or Python SDK. Label runs with their prompt and model versions.</p></li>
+        <li><h3>It learns normal</h3><p>Plumbline computes task success, false completions, latency, cost and about 50 other measures per agent, each day, and learns each one's usual range.</p></li>
+        <li><h3>It tells you</h3><p>When a measure moves the wrong way, your team hears about it once, with the likely cause and the runs behind it. Hard failures are caught within minutes.</p></li>
+      </ol>
+      <div class="snippet" aria-label="Python example">
+<pre><span class="c"># Python. Any OpenTelemetry exporter works too.</span>
+plumbline = Plumbline(URL, KEY, version={"prompt": "v12"})
+with plumbline.run("stylist-matcher", request_id) as run:
+    shortlist = match(request)
+    run.end("succeeded", claimed_done=True)</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="voice">
+    <div class="wrap two">
+      <div>
+        <span class="label">Voice agents</span>
+        <h2>Phone agents get worse in their own ways.</h2>
+        <p style="color:var(--ink-2)">Plumbline watches calls from Vapi, Retell, Pipecat, LiveKit or your own stack, and tracks what only calls have.</p>
+      </div>
+      <div>
+        <ul class="checks">
+          <li>How long callers wait for each reply, and calls with dead air over 3 seconds</li>
+          <li>Callers who hang up in the first few seconds</li>
+          <li>Transfers to a person, and unhappy callers</li>
+          <li>Cost per minute</li>
+          <li>The agent version behind a change, picked up automatically from Retell</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap two">
+      <div>
+        <span class="label">Works with</span>
+        <h2>The stack you already have.</h2>
+        <ul class="stack" aria-label="Supported frameworks and platforms">
+          <li>LangGraph</li><li>LangChain</li><li>OpenAI Agents SDK</li><li>CrewAI</li><li>LlamaIndex</li><li>Vercel AI SDK</li>
+          <li>OpenTelemetry</li><li>Vapi</li><li>Retell</li><li>Pipecat</li><li>LiveKit Agents</li>
+        </ul>
+      </div>
+      <div>
+        <span class="label">Built for</span>
+        <h2>Startups shipping agents to real customers.</h2>
+        <ul class="checks">
+          <li>Teams without a dedicated evaluation or ML platform group</li>
+          <li>Your data stays in your own Postgres; prompts and outputs are not stored unless you choose to grade them</li>
+          <li>Alerts that fire together arrive as one message, not a dozen pings</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">Pricing</span>
+        <h2>Priced by runs, not seats.</h2>
+        <p style="color:var(--ink-2)">Bring your whole team: founders and product leads read the alerts and the daily note at no extra cost. A run is one session of your agent, or one call for a voice agent.</p>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="name"><h3>Free</h3></div>
+          <div class="price">$0</div>
+          <p class="for">Try it on one agent, with no approval needed.</p>
+          <ul>
+            <li>1 project</li>
+            <li>10k runs a month</li>
+            <li>14 days of history</li>
+            <li>Email alerts</li>
+          </ul>
+        </div>
+        <div class="plan pick">
+          <div class="name"><h3>Startup</h3><span class="tag">Most teams</span></div>
+          <div class="price">$199<small> / month</small></div>
+          <p class="for">For a team with agents live with customers.</p>
+          <ul>
+            <li>3 projects</li>
+            <li>250k runs a month</li>
+            <li>90 days of history</li>
+            <li>Slack and email alerts</li>
+            <li>Likely cause on every alert</li>
+            <li>Daily watcher note</li>
+            <li>Judge scoring and the CI eval gate</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <div class="name"><h3>Growth</h3></div>
+          <div class="price">$599<small> / month</small></div>
+          <p class="for">For several agents, or voice at volume.</p>
+          <ul>
+            <li>Unlimited projects</li>
+            <li>2M runs a month</li>
+            <li>1 year of history</li>
+            <li>Voice monitoring included</li>
+            <li>Everything in Startup</li>
+            <li>Priority support</li>
+          </ul>
+        </div>
+        <div class="plan">
+          <div class="name"><h3>Self-hosted</h3></div>
+          <div class="price">$2,000+<small> / month</small></div>
+          <p class="for">Billed yearly. For security reviews and regulated data.</p>
+          <ul>
+            <li>Runs in your own cloud</li>
+            <li>Your data never leaves it</li>
+            <li>Single sign-on</li>
+            <li>Support agreement</li>
+          </ul>
+        </div>
+      </div>
+      <div class="usage">
+        <div><b>$0.50 per 1,000 runs</b><span>beyond your plan's monthly runs</span></div>
+        <div><b>$0.03 per call</b><span>voice monitoring on the Startup plan</span></div>
+        <div><b>Your own model key</b><span>for judge scoring and the watcher, so model costs stay on your bill at your rates</span></div>
+      </div>
+      <div class="founding">
+        <p><strong>Try it free for 14 days.</strong> Startup and Growth both come with a 14-day trial. The first 10 teams to become paying customers get 50% off for 12 months.</p>
+        <a class="cta" data-signup href="#early-access">Request early access</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="early-access" class="access">
+    <div class="wrap">
+      <div class="box">
+        <span class="label">Early access</span>
+        <h2>Early access is open to a small group of teams.</h2>
+        <p>If your agents are live with customers and you want to know the moment they slip, tell us what you are building. We are also working closely with a few design partners, who get a longer free period in return for a short weekly call about what to fix.</p>
+        <div><a class="cta" data-signup href="#early-access">Request early access</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Plumbline · Quality monitoring for AI agents</span>
+    <span>© 2026 Plumbline</span>
+  </div>
+</footer>
+
+<script>
+  // Where "Request early access" goes: a form you control (Tally, Google Forms, Typeform). Until it is set, the
+  // buttons say early access opens soon instead of leading nowhere.
+  const SIGNUP_URL = "";
+  for (const a of document.querySelectorAll("[data-signup]")) {
+    if (SIGNUP_URL) {
+      a.href = SIGNUP_URL;
+      a.target = "_blank";
+      a.rel = "noopener";
+    } else {
+      const span = document.createElement("span");
+      span.className = "cta soon";
+      span.textContent = "Early access opens soon";
+      a.replaceWith(span);
+    }
+  }
+</script>
+</body>
+</html>
