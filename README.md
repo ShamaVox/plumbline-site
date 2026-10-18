@@ -7,7 +7,8 @@ It is hosted free on GitHub Pages.
 
 1. On GitHub, create a new **public** repository, for example `plumbline-site`. Keep it separate from the Plumbline
    code: GitHub Pages is free only for public repositories, and the product code can stay private.
-2. Upload the files in this folder (`index.html`, `og.png`, `.nojekyll`, `README.md`) to the repository, or push them:
+2. Upload the files in this folder (`index.html`, `og.png`, `.nojekyll`, `README.md`) to the repository, or push them.
+   `.nojekyll` is an empty file that tells GitHub Pages to serve the files as they are:
 
    ```bash
    cd plumbline-site
@@ -52,8 +53,24 @@ founding-customer offer (50% off for 12 months for the first 10 paying teams). D
 mentioned without a length: agree it with each partner. To change a price, edit the
 `id="pricing"` section in `index.html`; nothing else depends on it.
 
+## What the page says, and where it comes from
+
+Every claim on the page is something Plumbline 0.6 does. When the product changes, change the page with it:
+
+| Section | Claims | In the product |
+|---|---|---|
+| Hero, What it catches | Likely cause on alerts, false completions, the watcher, the CI eval gate | alerts, `run.*` metrics, `plumbline eval run` |
+| Human in the loop | Policies decide when an agent hands over; people told at once; service levels; the agent gets the decision | `docs/escalations.md` |
+| Accountability | Post-mortems written from the records; a hash-chained, signed audit trail; the opt-in benchmark (five-organisation minimum); MCP | `docs/postmortems.md`, `docs/audit.md`, `docs/benchmark.md`, `docs/mcp.md` |
+| How it works | SDKs, OpenTelemetry or MCP; the dashboard's Connect page; more than 50 measures (57 built in) | `plumbline metrics` |
+| Voice agents | Call quality out of 100 with flagged moments; reply waits and dead air; early hang-ups, transfers, frustrated callers | `docs/voice.md` |
+| Pricing | Which plan includes escalation, post-mortems, audit export and call quality | a business decision, not the product: edit freely |
+
+The example escalation, alert and watcher note are labelled as examples. Keep any figures you add true to what
+Plumbline actually does.
+
 ## Editing
 
 Everything is in `index.html`: copy, colors (the tokens at the top of the `<style>` block) and sections. The page
-follows the visitor's light or dark setting. The example alert and watcher note are labelled as examples; keep any
-figures you add to the page true to what Plumbline actually does.
+follows the visitor's light or dark setting and has no build step. The product code stays in its own private
+repository; this site repository is public only because GitHub Pages is free for public repositories.
