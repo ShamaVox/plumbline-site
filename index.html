@@ -5,15 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Plumbline · Quality monitoring for AI agents</title>
 <meta name="description" content="Plumbline watches AI agents in production. When quality slips, it tells your team and names the likely cause. When an agent should not act alone, it hands the moment to a person. And it keeps a signed record of everything agents did.">
-<!-- Link previews (LinkedIn, Slack, X). Replace SITE_URL with your GitHub Pages address, e.g. https://your-name.github.io/plumbline-site -->
+<!-- Link previews (LinkedIn, Slack, X, Discord). If the address changes (a custom domain), change it here and in og:image. -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="Plumbline: know when your AI agent gets worse, and why">
 <meta property="og:description" content="Quality monitoring for AI agents in production: alerts that name the likely cause, a person in the loop when it matters, post-mortems written for you, and a signed audit trail.">
-<meta property="og:url" content="SITE_URL/">
-<meta property="og:image" content="SITE_URL/og.png">
+<meta property="og:url" content="https://shamavox.github.io/plumbline-site/">
+<meta property="og:image" content="https://shamavox.github.io/plumbline-site/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Plumbline: know when your AI agent gets worse, and why">
+<meta name="twitter:description" content="Catches what logs miss: agents saying &quot;done&quot; when they weren't, quality drifting for weeks, risky actions nobody approved.">
+<meta name="twitter:image" content="https://shamavox.github.io/plumbline-site/og.png">
+<link rel="canonical" href="https://shamavox.github.io/plumbline-site/">
 <meta name="theme-color" content="#15202b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cline x1='16' y1='2' x2='16' y2='14' stroke='%239a6418' stroke-width='2.5'/%3E%3Cpath d='M8 14h16l-8 16z' fill='%239a6418'/%3E%3C/svg%3E">
 <style>html{-webkit-text-size-adjust:100%}body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
@@ -165,7 +169,28 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
 .founding { margin-top: 28px; border: 1px dashed var(--brass); background: var(--brass-soft); border-radius: 12px; padding: 18px 20px; display: flex; gap: 12px 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .founding p { max-width: 70ch; }
 
+/* Demo video */
+.demo { padding-block: clamp(40px, 6vw, 72px); }
+.demo .frame { position: relative; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: #0b0d12; box-shadow: 0 30px 80px -40px rgba(21, 32, 43, 0.6); aspect-ratio: 16 / 9; }
+.demo video { display: block; width: 100%; height: 100%; object-fit: contain; background: #0b0d12; }
+.demo .under { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; margin-top: 14px; color: var(--ink-2); font-size: 0.92rem; }
+
+/* Why I built it */
+.founder { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(28px, 5vw, 56px); align-items: start; }
+.founder .quote { font-family: var(--display); font-stretch: 104%; font-size: clamp(1.3rem, 2.6vw, 1.7rem); font-weight: 600; line-height: 1.32; }
+.founder .body { display: grid; gap: 16px; color: var(--ink-2); }
+.founder .sig { display: grid; gap: 2px; margin-top: 6px; color: var(--ink); }
+.founder .sig span { color: var(--ink-2); font-size: 0.92rem; }
+
+/* Design partners */
+.partners { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 8px; }
+.partners div { border-top: 1.5px solid var(--brass); padding-top: 12px; display: grid; gap: 4px; }
+.partners b { font-family: var(--display); font-stretch: 108%; font-size: 1.05rem; }
+.partners span { color: var(--ink-2); font-size: 0.95rem; }
+.contact-alt { font-size: 0.92rem; color: var(--ink-2); }
+
 @media (max-width: 860px) {
+  .founder, .partners { grid-template-columns: minmax(0, 1fr); }
   .hero .wrap, .watcher, .two { grid-template-columns: minmax(0, 1fr); }
   .steps { grid-template-columns: minmax(0, 1fr); }
   .catches { grid-template-columns: minmax(0, 1fr); }
@@ -191,13 +216,15 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       Plumbline
     </a>
     <nav class="links" aria-label="Sections">
+      <a href="#demo">Demo</a>
       <a href="#what-it-catches">What it catches</a>
       <a href="#human-in-the-loop" class="hide-sm">Human in the loop</a>
       <a href="#accountability" class="hide-sm">Accountability</a>
       <a href="#how-it-works" class="hide-sm">How it works</a>
       <a href="#voice" class="hide-sm">Voice agents</a>
       <a href="#pricing">Pricing</a>
-      <a href="#early-access" class="hide-sm">Early access</a>
+      <a href="#why">Why I built it</a>
+      <a href="#early-access" class="hide-sm">Design partners</a>
     </nav>
   </div>
 </header>
@@ -216,8 +243,8 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         <h1>Know when your agent gets worse, and why.</h1>
         <p class="lede">Plumbline watches your AI agents in production. When quality slips, it tells your team in Slack or email and names the likely cause: the prompt version, the failing step, the deploy. When an agent should not act alone, it hands the moment to a person and gives the agent their decision.</p>
         <div class="hero-actions">
-          <a class="cta" data-signup href="#early-access">Request early access</a>
-          <a class="ghost" href="#what-it-catches">See what it catches</a>
+          <a class="cta" data-signup href="#early-access">Become a design partner</a>
+          <a class="ghost" href="#demo">Watch the 2-minute demo</a>
         </div>
         <p class="hero-note">Runs on your own Postgres. Set up in an afternoon.</p>
       </div>
@@ -232,6 +259,25 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       </figure>
     </div>
   </div>
+
+  <section id="demo" class="demo">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="label">See it work</span>
+        <h2>Two minutes, on the real dashboard.</h2>
+      </div>
+      <div class="frame">
+        <video controls playsinline preload="none" poster="media/plumbline-demo-poster.jpg" aria-label="Plumbline demo: alerts with a likely cause, a person deciding a risky refund, and a CI eval gate blocking a regression">
+          <source src="media/plumbline-demo.mp4" type="video/mp4">
+          <a href="media/plumbline-demo.mp4">Download the demo video</a>
+        </video>
+      </div>
+      <div class="under">
+        <span>Captions are in the video. Narrated by the founder.</span>
+        <span>An alert with its likely cause · a person approving a $900 refund · a CI gate blocking a bad prompt change</span>
+      </div>
+    </div>
+  </section>
 
   <section class="problem">
     <div class="wrap">
@@ -419,74 +465,30 @@ with plumbline.run("stylist-matcher", request_id) as run:
     </div>
   </section>
 
+  <section id="why">
+    <div class="wrap founder">
+      <div class="section-head" style="margin:0">
+        <span class="label">Why I built it</span>
+        <p class="quote">"The failures that hurt us never threw an error."</p>
+      </div>
+      <div class="body">
+        <p>I'm a technical cofounder and CTO. While building our own multi-agent system, I kept seeing agents fail silently. A run would say "done" when the agent hadn't actually done the thing. Quality would drift over a few weeks with nobody noticing. An agent would be about to take a risky action with no one checking. Logs never caught any of it.</p>
+        <p>So I built Plumbline for us: something that checks whether the job was really done, says what changed when quality slips, and puts a person in front of the decisions an agent shouldn't make alone. Once I saw how much it caught, I decided to make it available to every team shipping agents.</p>
+        <div class="sig"><strong>Shama Keskar</strong><span>Founder of Plumbline · technical cofounder and CTO · ex-Google, Amazon, LinkedIn · took agents to production at an AI-native retail startup and an accessibility startup</span></div>
+      </div>
+    </div>
+  </section>
+
   <section id="pricing">
     <div class="wrap">
       <div class="section-head">
         <span class="label">Pricing</span>
-        <h2>Priced by runs, not seats.</h2>
-        <p style="color:var(--ink-2)">Bring your whole team: founders and product leads read the alerts and the daily note at no extra cost. A run is one session of your agent, or one call for a voice agent.</p>
-      </div>
-      <div class="plans">
-        <div class="plan">
-          <div class="name"><h3>Free</h3></div>
-          <div class="price">$0</div>
-          <p class="for">Try it on one agent, with no approval needed.</p>
-          <ul>
-            <li>1 project</li>
-            <li>10k runs a month</li>
-            <li>14 days of history</li>
-            <li>Email alerts</li>
-          </ul>
-        </div>
-        <div class="plan pick">
-          <div class="name"><h3>Startup</h3><span class="tag">Most teams</span></div>
-          <div class="price">$199<small> / month</small></div>
-          <p class="for">For a team with agents live with customers.</p>
-          <ul>
-            <li>3 projects</li>
-            <li>250k runs a month</li>
-            <li>90 days of history</li>
-            <li>Slack and email alerts</li>
-            <li>Likely cause on every alert</li>
-            <li>Daily watcher note</li>
-            <li>Judge scoring and the CI eval gate</li>
-            <li>Human escalation and post-mortems</li>
-          </ul>
-        </div>
-        <div class="plan">
-          <div class="name"><h3>Growth</h3></div>
-          <div class="price">$599<small> / month</small></div>
-          <p class="for">For several agents, or voice at volume.</p>
-          <ul>
-            <li>Unlimited projects</li>
-            <li>2M runs a month</li>
-            <li>1 year of history</li>
-            <li>Voice monitoring and call quality included</li>
-            <li>Signed audit-trail export</li>
-            <li>Everything in Startup</li>
-            <li>Priority support</li>
-          </ul>
-        </div>
-        <div class="plan">
-          <div class="name"><h3>Self-hosted</h3></div>
-          <div class="price">$2,000+<small> / month</small></div>
-          <p class="for">Billed yearly. For security reviews and regulated data.</p>
-          <ul>
-            <li>Runs in your own cloud</li>
-            <li>Your data never leaves it</li>
-            <li>Single sign-on</li>
-            <li>Support agreement</li>
-          </ul>
-        </div>
-      </div>
-      <div class="usage">
-        <div><b>$0.50 per 1,000 runs</b><span>beyond your plan's monthly runs</span></div>
-        <div><b>$0.03 per call</b><span>voice monitoring on the Startup plan</span></div>
-        <div><b>Your own model key</b><span>for judge scoring and the watcher, so model costs stay on your bill at your rates</span></div>
+        <h2>Free while we build it with you.</h2>
+        <p style="color:var(--ink-2)">Plumbline is in beta. Design partners use it free through the pilot. When plans open, they will be priced by runs, not seats, so founders and product leads can read the alerts and the daily note at no extra cost, and there will be a free tier to try it on one agent. Self-hosting in your own cloud will be available for security reviews and regulated data.</p>
       </div>
       <div class="founding">
-        <p><strong>Try it free for 14 days.</strong> Startup and Growth both come with a 14-day trial. The first 10 teams to become paying customers get 50% off for 12 months.</p>
-        <a class="cta" data-signup href="#early-access">Request early access</a>
+        <p><strong>Design partners keep a founding discount</strong> when plans open, in return for helping shape what Plumbline becomes.</p>
+        <a class="cta" data-signup href="#early-access">Become a design partner</a>
       </div>
     </div>
   </section>
@@ -494,10 +496,16 @@ with plumbline.run("stylist-matcher", request_id) as run:
   <section id="early-access" class="access">
     <div class="wrap">
       <div class="box">
-        <span class="label">Early access</span>
-        <h2>Early access is open to a small group of teams.</h2>
-        <p>If your agents are live with customers and you want to know the moment they slip, tell us what you are building. We are also working closely with a few design partners, who get a longer free period in return for a short weekly call about what to fix.</p>
-        <div><a class="cta" data-signup href="#early-access">Request early access</a></div>
+        <span class="label">Design partners</span>
+        <h2>Looking for 2–3 design partners running agents in production.</h2>
+        <p>If your agents are live with customers and a silent failure would cost you, I'd like to work with you directly. Tell me what your agents do and what has gone wrong so far, even if you're not ready to try anything yet.</p>
+        <div class="partners">
+          <div><b>A longer free pilot</b><span>Well past the usual 14-day trial, agreed with each partner.</span></div>
+          <div><b>A real say in the roadmap</b><span>A short weekly call about what to fix and what to build next.</span></div>
+          <div><b>Set up with you</b><span>I help connect your first agent and tune the alerts to your bar.</span></div>
+        </div>
+        <div><a class="cta" data-signup href="#early-access">Become a design partner</a></div>
+        <p class="contact-alt" data-contact-alt hidden></p>
       </div>
     </div>
   </section>
@@ -505,26 +513,45 @@ with plumbline.run("stylist-matcher", request_id) as run:
 
 <footer>
   <div class="wrap">
-    <span>Plumbline · Quality monitoring for AI agents</span>
+    <span>Plumbline · Quality monitoring for AI agents · built by <a href="https://shamavox.github.io/">Shama Keskar</a></span>
     <span>© 2026 Plumbline</span>
   </div>
 </footer>
 
 <script>
-  // Where "Request early access" goes: a form you control (Tally, Google Forms, Typeform). Until it is set, the
-  // buttons say early access opens soon instead of leading nowhere.
+  // Where "Become a design partner" goes. Set at least one; the first that is set wins.
+  //   SIGNUP_URL     a form you control (Tally, Google Forms, Typeform)
+  //   CONTACT_EMAIL  opens an email to you with the subject and questions filled in
+  //   CONTACT_URL    your LinkedIn or X profile, for a direct message
+  // Until one is set, the buttons say early access opens soon instead of leading nowhere.
   const SIGNUP_URL = "";
+  const CONTACT_EMAIL = "";
+  const CONTACT_URL = "";
+
+  const subject = "Plumbline design partner";
+  const body = "Hi Shama,\n\nWhat our agents do:\n\nWhat has gone wrong so far:\n\nHow many runs a day, roughly:\n";
+  const mail = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : "";
+  const target = SIGNUP_URL || mail || CONTACT_URL;
   for (const a of document.querySelectorAll("[data-signup]")) {
-    if (SIGNUP_URL) {
-      a.href = SIGNUP_URL;
-      a.target = "_blank";
-      a.rel = "noopener";
+    if (target) {
+      a.href = target;
+      if (!target.startsWith("mailto:")) { a.target = "_blank"; a.rel = "noopener"; }
     } else {
       const span = document.createElement("span");
       span.className = "cta soon";
       span.textContent = "Early access opens soon";
       a.replaceWith(span);
     }
+  }
+  // With a form as the main route, also offer the quicker one.
+  const alt = document.querySelector("[data-contact-alt]");
+  if (alt && SIGNUP_URL && (CONTACT_EMAIL || CONTACT_URL)) {
+    const link = document.createElement("a");
+    link.href = mail || CONTACT_URL;
+    link.textContent = CONTACT_EMAIL ? CONTACT_EMAIL : "send me a message";
+    if (!mail) { link.target = "_blank"; link.rel = "noopener"; }
+    alt.append("Rather just write? ", link, ".");
+    alt.hidden = false;
   }
 </script>
 </body>
