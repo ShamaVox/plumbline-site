@@ -11,9 +11,6 @@ blocks regressions in CI before they ship.
 
 **Source:** https://github.com/shamavox/plumbline (self-host it free; see its LICENSING.md)
 
-**Design partners:** I'm working with 2–3 teams running agents in production: a longer free pilot, help with setup,
-and a real say in the roadmap. [Apply here](https://forms.gle/v61cAjbzKYTn7Ci59).
-
 Built by [Shama Keskar](https://www.linkedin.com/in/shamakeskar/).
 
 ---

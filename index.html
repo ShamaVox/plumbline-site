@@ -674,7 +674,7 @@
       flex-wrap: wrap;
     }
 
-    /* Pricing */
+    /* (section removed) */
     .plans {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -872,7 +872,7 @@
       font-size: 0.92rem;
     }
 
-    /* Design partners */
+    /* (section removed) */
     .partners {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -985,9 +985,7 @@
         <a href="#accountability" class="hide-sm">Accountability</a>
         <a href="#how-it-works" class="hide-sm">How it works</a>
         <a href="#voice" class="hide-sm">Voice agents</a>
-        <a href="#pricing">Pricing</a>
         <a href="#why">Why I built it</a>
-        <a href="#early-access" class="hide-sm">Design partners</a>
         <a href="https://github.com/shamavox/plumbline" rel="noopener">GitHub</a>
       </nav>
     </div>
@@ -1012,7 +1010,7 @@
             Slack or email and names the likely cause: the prompt version, the failing step, the deploy. When an agent
             should not act alone, it hands the moment to a person and gives the agent their decision.</p>
           <div class="hero-actions">
-            <a class="cta" data-signup href="#early-access">Become a design partner</a>
+            <a class="cta" href="https://github.com/ShamaVox/plumbline">View on GitHub</a>
             <a class="ghost" href="#demo">Watch the 2-minute demo</a>
           </div>
           <p class="hero-note">Source available <a href="https://github.com/shamavox/plumbline" rel="noopener">on GitHub</a>. Runs on your own Postgres. Set up in an afternoon.</p>
@@ -1317,45 +1315,7 @@ with plumbline.run("stylist-matcher", request_id) as run:
       </div>
     </section>
 
-    <section id="pricing">
-      <div class="wrap">
-        <div class="section-head">
-          <span class="label">Pricing</span>
-          <h2>Free while we build it with you.</h2>
-          <p style="color:var(--ink-2)">Plumbline is in beta. Design partners use it free through the pilot. When plans
-            open, they will be priced by runs, not seats, so founders and product leads can read the alerts and the
-            daily note at no extra cost, and there will be a free tier to try it on one agent. You can self-host it in your
-            own cloud today, free, <a href="https://github.com/shamavox/plumbline" rel="noopener">from GitHub</a>; the signed audit-trail export and the benchmark need a license key.</p>
-        </div>
-        <div class="founding">
-          <p><strong>Design partners keep a founding discount</strong> when plans open, in return for helping shape what
-            Plumbline becomes.</p>
-          <a class="cta" data-signup href="#early-access">Become a design partner</a>
-        </div>
-      </div>
-    </section>
 
-    <section id="early-access" class="access">
-      <div class="wrap">
-        <div class="box">
-          <span class="label">Design partners</span>
-          <h2>Looking for 2–3 design partners running agents in production.</h2>
-          <p>If your agents are live with customers and a silent failure would cost you, I'd like to work with you
-            directly. Tell me what your agents do and what has gone wrong so far, even if you're not ready to try
-            anything yet.</p>
-          <div class="partners">
-            <div><b>A longer free pilot</b><span>Well past the usual 14-day trial, agreed with each partner.</span>
-            </div>
-            <div><b>A real say in the roadmap</b><span>A short weekly call about what to fix and what to build
-                next.</span></div>
-            <div><b>Set up with you</b><span>I help connect your first agent and tune the alerts to your bar.</span>
-            </div>
-          </div>
-          <div><a class="cta" data-signup href="#early-access">Become a design partner</a></div>
-          <p class="contact-alt" data-contact-alt hidden></p>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer>
@@ -1367,16 +1327,16 @@ with plumbline.run("stylist-matcher", request_id) as run:
   </footer>
 
   <script>
-    // Where "Become a design partner" goes. Set at least one; the first that is set wins.
+    // Sign-up target (not used on this page).
     //   SIGNUP_URL     a form you control (Tally, Google Forms, Typeform)
     //   CONTACT_EMAIL  opens an email to you with the subject and questions filled in
     //   CONTACT_URL    your LinkedIn or X profile, for a direct message
     // Until one is set, the buttons say early access opens soon instead of leading nowhere.
-    const SIGNUP_URL = "https://forms.gle/v61cAjbzKYTn7Ci59";
+    const SIGNUP_URL = "";
     const CONTACT_EMAIL = "";
     const CONTACT_URL = "";
 
-    const subject = "Plumbline design partner";
+    const subject = "Plumbline";
     const body = "Hi Shama,\n\nWhat our agents do:\n\nWhat has gone wrong so far:\n\nHow many runs a day, roughly:\n";
     const mail = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : "";
     const target = SIGNUP_URL || mail || CONTACT_URL;
