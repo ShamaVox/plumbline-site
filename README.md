@@ -1,5 +1,7 @@
 # Plumbline
 
+Copyright 2026 [Styled By and Shama AI Ventures LLC]
+
 Quality monitoring for AI agents in production.
 
 Plumbline catches the failures that never throw an error: an agent reporting "done" when the job wasn't done, quality
