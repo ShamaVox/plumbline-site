@@ -4,1382 +4,237 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Plumbline · Quality monitoring for AI agents</title>
-  <meta name="description"
-    content="Plumbline watches AI agents in production. When quality slips, it tells your team and names the likely cause. When an agent should not act alone, it hands the moment to a person. And it keeps a signed record of everything agents did.">
-  <!-- Link previews (LinkedIn, Slack, X, Discord). If the address changes (a custom domain), change it here and in og:image. -->
+  <title>Plumbline · Private beta</title>
+  <meta name="description" content="Agents don't throw exceptions. Plumbline does. It catches AI agents that say &quot;done&quot; when they aren't, tells you what changed, and turns every incident into a test. Private beta.">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Plumbline: know when your AI agent gets worse, and why">
-  <meta property="og:description"
-    content="Quality monitoring for AI agents in production: alerts that name the likely cause, a person in the loop when it matters, post-mortems written for you, and a signed audit trail.">
-  <meta property="og:url" content="https://shamavox.github.io/plumbline-site/">
-  <meta property="og:image" content="https://shamavox.github.io/plumbline-site/og.png">
+  <meta property="og:title" content="Plumbline: agents don't throw exceptions. Plumbline does.">
+  <meta property="og:description" content="Catch AI agents that say &quot;done&quot; when they aren't. Private beta, onboarding a few teams.">
+  <meta property="og:url" content="https://plumbline.shamakeskar.com/">
+  <meta property="og:image" content="https://plumbline.shamakeskar.com/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Plumbline: know when your AI agent gets worse, and why">
-  <meta name="twitter:description"
-    content="Catches what logs miss: agents saying &quot;done&quot; when they weren't, quality drifting for weeks, risky actions nobody approved.">
-  <meta name="twitter:image" content="https://shamavox.github.io/plumbline-site/og.png">
-  <link rel="canonical" href="https://shamavox.github.io/plumbline-site/">
+  <meta name="twitter:title" content="Plumbline: agents don't throw exceptions. Plumbline does.">
+  <meta name="twitter:description" content="Catch AI agents that say &quot;done&quot; when they aren't. Private beta.">
+  <meta name="twitter:image" content="https://plumbline.shamakeskar.com/og.png">
+  <link rel="canonical" href="https://plumbline.shamakeskar.com/">
   <meta name="theme-color" content="#15202b">
-  <link rel="icon"
-    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cline x1='16' y1='2' x2='16' y2='14' stroke='%239a6418' stroke-width='2.5'/%3E%3Cpath d='M8 14h16l-8 16z' fill='%239a6418'/%3E%3C/svg%3E">
-  <style>
-    html {
-      -webkit-text-size-adjust: 100%
-    }
-
-    body {
-      margin: 0
-    }
-
-    img {
-      max-width: 100%
-    }
-
-    [hidden] {
-      display: none !important
-    }
-
-    :root {
-      padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px)
-    }
-  </style>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cline x1='16' y1='2' x2='16' y2='14' stroke='%239a6418' stroke-width='2.5'/%3E%3Cpath d='M8 14h16l-8 16z' fill='%239a6418'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
   <style>
-    /* Layout: one plumb line drops through the page; each section hangs off it, the thesis at the top, early access at the bottom. */
     :root {
-      --bg: #f4f6f7;
-      --surface: #ffffff;
-      --ink: #15202b;
-      --ink-2: #4a5866;
-      --line: rgba(21, 32, 43, 0.12);
-      --brass: #9a6418;
-      --brass-soft: rgba(154, 100, 24, 0.10);
-      --critical: #c23a2b;
-      --good: #1d7a46;
-      --code-bg: #eef1f3;
+      --bg: #f4f6f7; --surface: #ffffff; --ink: #15202b; --ink-2: #4a5866; --line: rgba(21, 32, 43, 0.12);
+      --brass: #9a6418; --brass-soft: rgba(154, 100, 24, 0.10); --bad: #c23a2b; --good: #1d7a46;
+      --term-bg: #0f161c; --term-ink: #dfe6ea; --term-dim: #7f909d;
       --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
       --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      --gutter: max(16px, env(safe-area-inset-left, 0px));
-      --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+      color-scheme: light;
     }
-
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --bg: #0f161c;
-        --surface: #16212a;
-        --ink: #e7ecef;
-        --ink-2: #9fb0bd;
-        --line: rgba(231, 236, 239, 0.12);
-        --brass: #d9a24f;
-        --brass-soft: rgba(217, 162, 79, 0.12);
-        --critical: #ef6f5f;
-        --good: #4cc483;
-        --code-bg: #121b22;
-        color-scheme: dark;
+        --bg: #0f161c; --surface: #16212a; --ink: #e7ecef; --ink-2: #9fb0bd; --line: rgba(231, 236, 239, 0.12);
+        --brass: #d9a24f; --brass-soft: rgba(217, 162, 79, 0.12); --bad: #ef6f5f; --good: #4cc483;
+        --term-bg: #0a1015; color-scheme: dark;
       }
     }
-
     :root[data-theme="dark"] {
-      --bg: #0f161c;
-      --surface: #16212a;
-      --ink: #e7ecef;
-      --ink-2: #9fb0bd;
-      --line: rgba(231, 236, 239, 0.12);
-      --brass: #d9a24f;
-      --brass-soft: rgba(217, 162, 79, 0.12);
-      --critical: #ef6f5f;
-      --good: #4cc483;
-      --code-bg: #121b22;
-      color-scheme: dark;
+      --bg: #0f161c; --surface: #16212a; --ink: #e7ecef; --ink-2: #9fb0bd; --line: rgba(231, 236, 239, 0.12);
+      --brass: #d9a24f; --brass-soft: rgba(217, 162, 79, 0.12); --bad: #ef6f5f; --good: #4cc483;
+      --term-bg: #0a1015; color-scheme: dark;
     }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); }
+    a { color: inherit; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--body);
-      font-size: 17px;
-      line-height: 1.6;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    a:focus-visible,
-    button:focus-visible {
-      outline: 2px solid var(--brass);
-      outline-offset: 3px;
-      border-radius: 4px;
-    }
-
-    .wrap {
-      max-width: 1120px;
-      margin: 0 auto;
-      padding-left: var(--gutter);
-      padding-right: var(--gutter-r);
-    }
-
-    h1,
-    h2,
-    h3 {
-      font-family: var(--display);
-      text-wrap: balance;
-      margin: 0;
-    }
-
-    h1 {
-      font-size: clamp(2.4rem, 6.4vw, 4.6rem);
-      font-weight: 820;
-      font-stretch: 112%;
-      line-height: 1.02;
-      letter-spacing: -0.02em;
-    }
-
-    h2 {
-      font-size: clamp(1.7rem, 3.6vw, 2.5rem);
-      font-weight: 780;
-      font-stretch: 108%;
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-    }
-
-    h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      font-stretch: 100%;
-      line-height: 1.25;
-    }
-
-    p {
-      margin: 0;
-      max-width: 65ch;
-    }
-
-    .label {
-      font-family: var(--display);
-      font-stretch: 125%;
-      font-weight: 700;
-      font-size: 0.74rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--brass);
-    }
-
-    .lede {
-      font-size: 1.2rem;
-      color: var(--ink-2);
-    }
-
-    code,
-    .mono {
-      font-family: var(--mono);
-      font-size: 0.86em;
-    }
-
-    /* Header */
-    header.top {
-      border-bottom: 1px solid var(--line);
-    }
-
-    header.top .wrap {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding-block: 18px;
-      flex-wrap: wrap;
-    }
-
-    .mark {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--display);
-      font-weight: 800;
-      font-stretch: 118%;
-      font-size: 1.25rem;
-      text-decoration: none;
-      letter-spacing: -0.01em;
-    }
-
-    .mark svg {
-      width: 18px;
-      height: 26px;
-    }
-
-    nav.links {
-      display: flex;
-      gap: 22px;
-      flex-wrap: wrap;
-      font-size: 0.95rem;
-    }
-
-    nav.links a {
-      text-decoration: none;
-      color: var(--ink-2);
-    }
-
-    nav.links a:hover {
-      color: var(--ink);
-    }
+    /* Top bar */
+    header { padding: 18px 0; }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .mark { display: inline-flex; align-items: center; gap: 9px; font: 800 1.15rem var(--display); text-decoration: none; }
+    .mark svg { width: 14px; height: 21px; color: var(--ink); }
+    header nav { display: flex; align-items: center; gap: 20px; font-size: .95rem; }
+    header nav a { text-decoration: none; color: var(--ink-2); }
+    header nav a:hover { color: var(--ink); }
 
     /* Buttons */
-    .cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--ink);
-      color: var(--bg);
-      text-decoration: none;
-      font-weight: 700;
-      padding: 13px 22px;
-      border-radius: 999px;
-      font-size: 1rem;
-      border: 0;
-      cursor: pointer;
-    }
-
-    .cta:hover {
-      background: var(--brass);
-      color: #fff;
-    }
-
-    .cta.soon {
-      background: transparent;
-      color: var(--ink-2);
-      border: 1px dashed var(--line);
-      cursor: default;
-    }
-
-    .ghost {
-      color: var(--ink);
-      font-weight: 700;
-      text-decoration: none;
-      border-bottom: 2px solid var(--brass);
-      padding-bottom: 2px;
-    }
-
-    /* Hero: the line and the bob */
-    .hero {
-      position: relative;
-      padding-block: clamp(48px, 8vw, 96px) clamp(40px, 6vw, 72px);
-    }
-
-    .hero .wrap {
-      display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-      gap: clamp(32px, 5vw, 64px);
-      align-items: start;
-    }
-
-    .hero-copy {
-      display: grid;
-      gap: 22px;
-      position: relative;
-      padding-left: 44px;
-    }
-
-    .plumb {
-      position: absolute;
-      left: 6px;
-      top: -120px;
-      bottom: 0;
-      width: 28px;
-      pointer-events: none;
-    }
-
-    .plumb .string {
-      position: absolute;
-      left: 13px;
-      top: 0;
-      bottom: 34px;
-      width: 1.5px;
-      background: var(--brass);
-      opacity: 0.75;
-    }
-
-    .plumb .bob {
-      position: absolute;
-      left: 3px;
-      bottom: 0;
-      width: 22px;
-      height: 34px;
-    }
-
-    .plumb-swing {
-      position: absolute;
-      inset: 0;
-      transform-origin: 14px 0;
-      animation: settle 2.6s cubic-bezier(.2, .7, .2, 1) 0.2s both;
-    }
-
-    @keyframes settle {
-      0% {
-        transform: rotate(7deg);
-      }
-
-      30% {
-        transform: rotate(-4deg);
-      }
-
-      55% {
-        transform: rotate(2deg);
-      }
-
-      78% {
-        transform: rotate(-0.8deg);
-      }
-
-      100% {
-        transform: rotate(0deg);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .plumb-swing {
-        animation: none;
-      }
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 22px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 6px;
-    }
-
-    .hero-note {
-      font-size: 0.92rem;
-      color: var(--ink-2);
-    }
-
-    /* The example alert, as a message would arrive */
-    .message {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: 0 18px 50px -24px rgba(21, 32, 43, 0.35);
-      overflow: hidden;
-      min-width: 0;
-    }
-
-    .message .head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 18px;
-      border-bottom: 1px solid var(--line);
-      font-size: 0.85rem;
-      color: var(--ink-2);
-      flex-wrap: wrap;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      display: inline-block;
-      background: var(--critical);
-      margin-right: 8px;
-      vertical-align: 1px;
-    }
-
-    .dot.brass {
-      background: var(--brass);
-    }
-
-    .message .body {
-      padding: 18px;
-      display: grid;
-      gap: 12px;
-    }
-
-    .message .title {
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .message .cause {
-      font-family: var(--mono);
-      font-size: 0.84rem;
-      line-height: 1.6;
-      background: var(--code-bg);
-      border-radius: 8px;
-      padding: 14px;
-      color: var(--ink);
-      overflow-wrap: anywhere;
-    }
-
-    .message .cause b {
-      color: var(--brass);
-      font-weight: 600;
-    }
-
-    .message .meta {
-      font-size: 0.82rem;
-      color: var(--ink-2);
-    }
-
-    .example-tag {
-      font-family: var(--display);
-      font-stretch: 125%;
-      font-size: 0.68rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 3px 9px;
-    }
-
-    /* Sections */
-    section {
-      padding-block: clamp(56px, 8vw, 96px);
-      border-top: 1px solid var(--line);
-    }
-
-    .section-head {
-      display: grid;
-      gap: 14px;
-      margin-bottom: 40px;
-    }
-
-    .problem p+p {
-      margin-top: 18px;
-    }
-
-    .problem .big {
-      font-family: var(--display);
-      font-stretch: 104%;
-      font-size: clamp(1.4rem, 2.8vw, 1.9rem);
-      font-weight: 600;
-      line-height: 1.3;
-      max-width: 34ch;
-    }
-
-    .catches {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0;
-      border-top: 1px solid var(--line);
-    }
-
-    .catch {
-      padding: 28px 28px 30px 0;
-      display: grid;
-      gap: 10px;
-      border-bottom: 1px solid var(--line);
-      align-content: start;
-    }
-
-    .catch:nth-child(odd) {
-      border-right: 1px solid var(--line);
-    }
-
-    .catch:nth-child(even) {
-      padding-left: 28px;
-      padding-right: 0;
-    }
-
-    .catch .what {
-      font-family: var(--mono);
-      font-size: 0.8rem;
-      color: var(--brass);
-    }
-
-    .catch p {
-      color: var(--ink-2);
-    }
-
-    .watcher {
-      display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      gap: clamp(28px, 5vw, 56px);
-      align-items: center;
-    }
-
-    .note-list {
-      margin: 0;
-      padding-left: 20px;
-      display: grid;
-      gap: 12px;
-      font-size: 0.95rem;
-    }
-
-    .note-list li::marker {
-      color: var(--brass);
-      font-weight: 700;
-    }
-
-    .fact {
-      display: block;
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      color: var(--ink-2);
-      margin-top: 4px;
-    }
-
-    .steps {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 28px;
-      counter-reset: step;
-    }
-
-    .steps li {
-      display: grid;
-      gap: 10px;
-      align-content: start;
-      counter-increment: step;
-    }
-
-    .steps li::before {
-      content: counter(step);
-      font-family: var(--display);
-      font-stretch: 125%;
-      font-weight: 800;
-      font-size: 0.9rem;
-      color: var(--brass);
-      width: 34px;
-      height: 34px;
-      border: 1.5px solid var(--brass);
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-    }
-
-    .steps p {
-      color: var(--ink-2);
-      font-size: 0.98rem;
-    }
-
-    .snippet {
-      margin-top: 36px;
-      background: var(--code-bg);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 18px 20px;
-      overflow-x: auto;
-    }
-
-    .snippet pre {
-      margin: 0;
-      font-family: var(--mono);
-      font-size: 0.85rem;
-      line-height: 1.7;
-      color: var(--ink);
-    }
-
-    .snippet .c {
-      color: var(--ink-2);
-    }
-
-    .stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 10px;
-      margin-top: 8px;
-      padding: 0;
-      list-style: none;
-    }
-
-    .stack li {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 0.92rem;
-      background: var(--surface);
-    }
-
-    .two {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: clamp(28px, 5vw, 56px);
-    }
-
-    .two>div {
-      display: grid;
-      gap: 14px;
-      align-content: start;
-    }
-
-    .checks {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 10px;
-    }
-
-    .checks li {
-      padding-left: 22px;
-      position: relative;
-      color: var(--ink-2);
-    }
-
-    .checks li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0.7em;
-      width: 10px;
-      height: 1.5px;
-      background: var(--brass);
-    }
-
-    .access {
-      text-align: left;
-    }
-
-    .access .box {
-      border: 1.5px solid var(--ink);
-      border-radius: 18px;
-      padding: clamp(28px, 5vw, 48px);
-      display: grid;
-      gap: 18px;
-      background: var(--surface);
-    }
-
-    .access .box p {
-      color: var(--ink-2);
-    }
-
-    footer {
-      padding-block: 32px 48px;
-      border-top: 1px solid var(--line);
-      color: var(--ink-2);
-      font-size: 0.88rem;
-    }
-
-    footer .wrap {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    /* (section removed) */
-    .plans {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .plan {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 24px 22px;
-      display: grid;
-      gap: 14px;
-      align-content: start;
-      min-width: 0;
-    }
-
-    .plan.pick {
-      border: 1.5px solid var(--brass);
-      box-shadow: 0 18px 50px -30px rgba(154, 100, 24, 0.55);
-    }
-
-    .plan .name {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .plan .tag {
-      font-family: var(--display);
-      font-stretch: 125%;
-      font-size: 0.66rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--brass);
-    }
-
-    .price {
-      font-family: var(--display);
-      font-weight: 820;
-      font-stretch: 108%;
-      font-size: 2.3rem;
-      line-height: 1;
-      letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .price small {
-      font-family: var(--body);
-      font-size: 0.9rem;
-      font-weight: 400;
-      color: var(--ink-2);
-      letter-spacing: 0;
-    }
-
-    .plan .for {
-      color: var(--ink-2);
-      font-size: 0.93rem;
-    }
-
-    .plan ul {
-      list-style: none;
-      margin: 0;
-      padding: 14px 0 0;
-      border-top: 1px solid var(--line);
-      display: grid;
-      gap: 8px;
-      font-size: 0.93rem;
-    }
-
-    .plan li {
-      padding-left: 18px;
-      position: relative;
-    }
-
-    .plan li::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0.72em;
-      width: 8px;
-      height: 1.5px;
-      background: var(--brass);
-    }
-
-    .usage {
-      margin-top: 24px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .usage div {
-      border-top: 1px solid var(--line);
-      padding-top: 14px;
-      display: grid;
-      gap: 4px;
-    }
-
-    .usage b {
-      font-family: var(--display);
-      font-stretch: 108%;
-      font-size: 1.05rem;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .usage span {
-      color: var(--ink-2);
-      font-size: 0.92rem;
-    }
-
-    .founding {
-      margin-top: 28px;
-      border: 1px dashed var(--brass);
-      background: var(--brass-soft);
-      border-radius: 12px;
-      padding: 18px 20px;
-      display: flex;
-      gap: 12px 24px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .founding p {
-      max-width: 70ch;
-    }
-
-    /* Demo video */
-    .demo {
-      padding-block: clamp(40px, 6vw, 72px);
-    }
-
-    .demo .frame {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      background: #0b0d12;
-      box-shadow: 0 30px 80px -40px rgba(21, 32, 43, 0.6);
-      aspect-ratio: 16 / 9;
-    }
-
-    .demo video {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: #0b0d12;
-    }
-
-    .demo .under {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px 24px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-      color: var(--ink-2);
-      font-size: 0.92rem;
-    }
-
-    /* Why I built it */
-    .founder {
-      display: grid;
-      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-      gap: clamp(28px, 5vw, 56px);
-      align-items: start;
-    }
-
-    .founder .quote {
-      font-family: var(--display);
-      font-stretch: 104%;
-      font-size: clamp(1.3rem, 2.6vw, 1.7rem);
-      font-weight: 600;
-      line-height: 1.32;
-    }
-
-    .founder .body {
-      display: grid;
-      gap: 16px;
-      color: var(--ink-2);
-    }
-
-    .founder .sig {
-      display: grid;
-      gap: 2px;
-      margin-top: 6px;
-      color: var(--ink);
-    }
-
-    .founder .sig span {
-      color: var(--ink-2);
-      font-size: 0.92rem;
-    }
-
-    /* (section removed) */
-    .partners {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-      margin-top: 8px;
-    }
-
-    .partners div {
-      border-top: 1.5px solid var(--brass);
-      padding-top: 12px;
-      display: grid;
-      gap: 4px;
-    }
-
-    .partners b {
-      font-family: var(--display);
-      font-stretch: 108%;
-      font-size: 1.05rem;
-    }
-
-    .partners span {
-      color: var(--ink-2);
-      font-size: 0.95rem;
-    }
-
-    .contact-alt {
-      font-size: 0.92rem;
-      color: var(--ink-2);
-    }
-
-    @media (max-width: 860px) {
-
-      .founder,
-      .partners {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .hero .wrap,
-      .watcher,
-      .two {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .steps {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .catches {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .plans {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .usage {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .catch,
-      .catch:nth-child(even) {
-        padding: 24px 0;
-        border-right: 0;
-      }
-
-      .catch:nth-child(odd) {
-        border-right: 0;
-      }
-
-      nav.links {
-        gap: 16px;
-      }
-    }
-
-    @media (max-width: 520px) {
-      nav.links a.hide-sm {
-        display: none;
-      }
-
-      .plans {
-        grid-template-columns: minmax(0, 1fr);
-      }
-
-      .hero-copy {
-        padding-left: 34px;
-      }
-
-      .plumb {
-        left: 0;
-        top: -16px;
-      }
+    .cta { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: var(--bg); text-decoration: none;
+      font-weight: 700; padding: 13px 22px; border-radius: 999px; border: 0; }
+    .cta:hover { background: var(--brass); color: #fff; }
+    .cta.small { padding: 8px 16px; font-size: .9rem; }
+    .ghost { font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--brass); padding-bottom: 2px; }
+
+    /* Hero */
+    .hero { padding: 56px 0 40px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; font: 600 .8rem var(--mono); letter-spacing: .04em; text-transform: uppercase;
+      color: var(--brass); background: var(--brass-soft); padding: 6px 12px; border-radius: 999px; }
+    .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
+    h1 { font: 800 clamp(2.3rem, 6.4vw, 4.2rem)/1.04 var(--display); font-stretch: 92%; letter-spacing: -.015em; margin: 22px 0 18px; max-width: 16ch; }
+    h1 em { font-style: normal; color: var(--brass); }
+    .lede { font-size: clamp(1.08rem, 2.2vw, 1.25rem); color: var(--ink-2); max-width: 46ch; margin: 0 0 28px; }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; }
+
+    /* Demo */
+    .demo { padding: 8px 0 48px; }
+    .frame { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; box-shadow: 0 18px 50px rgba(15, 22, 28, .18); }
+    .frame video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+    .caption { font-size: .9rem; color: var(--ink-2); margin-top: 10px; }
+
+    /* Three things */
+    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-top: 8px; padding-bottom: 48px; }
+    .three div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+    .three h3 { font: 700 1.1rem var(--display); margin: 0 0 6px; }
+    .three p { margin: 0; color: var(--ink-2); font-size: .98rem; }
+
+    /* Terminal */
+    .term-wrap { padding: 0 0 48px; }
+    .term-wrap h2, .beta h2 { font: 800 clamp(1.5rem, 3.4vw, 2rem)/1.15 var(--display); margin: 0 0 14px; }
+    .term { background: var(--term-bg); color: var(--term-ink); border-radius: 12px; padding: 18px 20px; font: 14px/1.7 var(--mono);
+      overflow-x: auto; white-space: pre; border: 1px solid rgba(231, 236, 239, .08); }
+    .term .p { color: var(--term-dim); } .term .x { color: #ef6f5f; } .term .ok { color: #4cc483; } .term .b { font-weight: 600; }
+    .stack { color: var(--ink-2); font-size: .95rem; margin-top: 14px; }
+
+    /* Beta */
+    .beta { padding: 40px 0 56px; border-top: 1px solid var(--line); }
+    .deal { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 26px; }
+    .deal div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+    .deal h3 { font: 700 .8rem var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--brass); margin: 0 0 8px; }
+    .deal ul { margin: 0; padding-left: 18px; color: var(--ink-2); }
+    .founder { display: flex; gap: 14px; align-items: flex-start; margin-top: 34px; color: var(--ink-2); font-size: .98rem; max-width: 62ch; }
+    .founder svg { flex: none; width: 16px; height: 24px; margin-top: 4px; color: var(--ink); }
+    .founder b { color: var(--ink); }
+
+    footer { border-top: 1px solid var(--line); padding: 22px 0 32px; font-size: .88rem; color: var(--ink-2); }
+    footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+    footer a { color: var(--ink-2); }
+
+    @media (max-width: 760px) {
+      .three, .deal { grid-template-columns: 1fr; }
+      header nav .hide-sm { display: none; }
+      .hero { padding-top: 32px; }
+      .term { font-size: 12.5px; }
     }
   </style>
 </head>
 
 <body>
-  <header class="top">
+  <header>
     <div class="wrap">
-      <a class="mark" href="#top" aria-label="Plumbline home">
-        <svg viewBox="0 0 18 26" aria-hidden="true">
-          <line x1="9" y1="0" x2="9" y2="12" stroke="currentColor" stroke-width="1.6" />
-          <path d="M4 12 h10 l-5 13 z" fill="var(--brass)" />
-        </svg>
+      <a class="mark" href="./" aria-label="Plumbline home">
+        <svg viewBox="0 0 18 26" aria-hidden="true"><line x1="9" y1="0" x2="9" y2="12" stroke="currentColor" stroke-width="1.6" /><path d="M4 12 h10 l-5 13 z" fill="var(--brass)" /></svg>
         Plumbline
       </a>
-      <nav class="links" aria-label="Sections">
-        <a href="#demo">Demo</a>
-        <a href="#what-it-catches">What it catches</a>
-        <a href="#human-in-the-loop" class="hide-sm">Human in the loop</a>
-        <a href="#accountability" class="hide-sm">Accountability</a>
-        <a href="#how-it-works" class="hide-sm">How it works</a>
-        <a href="#voice" class="hide-sm">Voice agents</a>
-        <a href="#why">Why I built it</a>
-        <a href="#beta">Beta</a>
-        <a href="https://github.com/shamavox/plumbline" rel="noopener">GitHub</a>
+      <nav aria-label="Site">
+        <a href="#demo" class="hide-sm">Demo</a>
+        <a href="tour.html" class="hide-sm">Full tour</a>
+        <a class="cta small" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request access</a>
       </nav>
     </div>
   </header>
 
-  <main id="top">
-    <div class="hero">
+  <main>
+    <section class="hero">
       <div class="wrap">
-        <div class="hero-copy">
-          <div class="plumb" aria-hidden="true">
-            <div class="plumb-swing">
-              <div class="string"></div>
-              <svg class="bob" viewBox="0 0 22 34">
-                <path d="M3 2 h16 l-8 30 z" fill="var(--brass)" />
-                <rect x="2" y="0" width="18" height="4" rx="1" fill="var(--brass)" />
-              </svg>
-            </div>
-          </div>
-          <span class="label">Quality monitoring for AI agents</span>
-          <h1>Know when your agent gets worse, and why.</h1>
-          <p class="lede">Plumbline watches your AI agents in production. When quality slips, it tells your team in
-            Slack or email and names the likely cause: the prompt version, the failing step, the deploy. When an agent
-            should not act alone, it hands the moment to a person and gives the agent their decision.</p>
-          <div class="hero-actions">
-            <a class="cta" href="#beta">Become a beta tester</a>
-            <a class="ghost" href="#demo">Watch the 2-minute demo</a>
-          </div>
-          <p class="hero-note">Source available <a href="https://github.com/shamavox/plumbline" rel="noopener">on GitHub</a>. Runs on your own Postgres. Set up in an afternoon.</p>
+        <span class="pill"><span class="dot" aria-hidden="true"></span>Private beta · onboarding a few teams</span>
+        <h1>Agents don't throw exceptions. <em>Plumbline does.</em></h1>
+        <p class="lede">Your agent said “done.” Plumbline checks whether it was, tells you what changed when it wasn’t, and turns every incident into a test.</p>
+        <div class="actions">
+          <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
+          <a class="ghost" href="#demo">Watch the 2-minute demo</a>
         </div>
-
-        <figure class="message" aria-label="An example alert as it arrives in Slack" style="margin:0">
-          <div class="head"><span><span class="dot"></span>Critical · stylist-matcher · production</span><span
-              class="example-tag">Example</span></div>
-          <div class="body">
-            <div class="title">Verified task success fell from 95% to 80%</div>
-            <div class="cause"><b>Likely cause:</b> started around Tue 14:00 UTC. Runs on prompt v8 fail 25% of the
-              time, against 2% on other versions, and v8 first appeared then. Step send_shortlist started failing at the
-              same time. Deploy "Matcher prompt rewrite" (prompt v8) went out 8 minutes before.</div>
-            <div class="meta">Each part passed a significance test. The 41 runs behind it are one click away.</div>
-          </div>
-        </figure>
       </div>
-    </div>
+    </section>
 
-    <section id="demo" class="demo">
+    <section class="demo" id="demo">
       <div class="wrap">
-        <div class="section-head">
-          <span class="label">See it work</span>
-          <h2>Two minutes, on the real dashboard.</h2>
-        </div>
         <div class="frame">
-          <video controls playsinline preload="none" poster="media/plumbline-demo-poster.jpg"
-            aria-label="Plumbline demo: alerts with a likely cause, a person deciding a risky refund, and a CI eval gate blocking a regression">
+          <video controls playsinline preload="metadata" poster="media/plumbline-demo-poster.jpg"
+            aria-label="Plumbline demo: an alert with its likely cause, a person approving a risky refund, and a CI gate blocking a regression">
             <source src="media/plumbline-demo.mp4" type="video/mp4">
             <a href="media/plumbline-demo.mp4">Download the demo video</a>
           </video>
         </div>
-        <div class="under">
-          <span>Captions are in the video. Narrated by the founder.</span>
-          <span>An alert with its likely cause · a person approving a $900 refund · a CI gate blocking a bad prompt
-            change</span>
-        </div>
+        <p class="caption">Two minutes on the real dashboard, narrated by the founder.</p>
       </div>
     </section>
 
-    <section class="problem">
+    <section aria-label="What it does">
+      <div class="wrap three">
+      <div>
+        <h3>Catch silent failures</h3>
+        <p>Checks whether the job actually got done, not whether the agent returned 200.</p>
+      </div>
+      <div>
+        <h3>Know what changed</h3>
+        <p>Every alert names the likely cause: the prompt, the model, the deploy.</p>
+      </div>
+      <div>
+        <h3>Never ship it twice</h3>
+        <p>Every production failure becomes a regression test in your CI.</p>
+      </div>
+      </div>
+    </section>
+
+    <section class="term-wrap">
       <div class="wrap">
-        <div class="section-head">
-          <span class="label">The problem</span>
-        </div>
-        <p class="big">AI agents rarely crash. They get quietly worse.</p>
-        <p style="margin-top:18px;color:var(--ink-2)">A prompt tweak, a model update from your provider or a new tool
-          changes behaviour, and nothing errors. The agent still says it is done. Customers notice before your
-          dashboards do, and then someone spends a day reading traces to work out which change did it.</p>
-        <p style="color:var(--ink-2)">Plumbline checks whether the job was really done, learns what normal looks like
-          for each agent, and speaks up when that changes.</p>
+        <h2>A bad prompt change, blocked in CI.</h2>
+        <div class="term" role="img" aria-label="Terminal: plumbline eval run fails the gate because three cases that passed at baseline now fail"><span class="p">$</span> <span class="b">plumbline eval run evals/claims-review.yaml</span>
+claims-review v1.2.0  [ci]
+  pass rate     62.5%  (5 of 8)
+
+  Failing results (3):
+    <span class="x">✗</span> press    label: expected "flagged", got "clean"
+    <span class="x">✗</span> clients  label: expected "flagged", got "clean"
+    <span class="x">✗</span> degree   label: expected "flagged", got "clean"
+
+  Gate: <span class="x b">FAILED</span>  (baseline 100.0%)
+    <span class="x">✗</span> max_new_failures  now failing: clients, degree, press
+    <span class="ok">✓</span> tag:injection     1 of 1 passed
+<span class="p">$</span> echo $?
+1</div>
+        <p class="stack">Works with OpenAI Agents SDK, LangGraph, CrewAI, Vercel AI SDK, OpenTelemetry and MCP. Alerts in Slack or email. Runs in your own cloud.</p>
       </div>
     </section>
 
-    <section id="what-it-catches">
+    <section class="beta" id="beta">
       <div class="wrap">
-        <div class="section-head">
-          <span class="label">What it catches</span>
-          <h2>The failures that never throw an error.</h2>
+        <h2>Join the private beta.</h2>
+        <p class="lede" style="margin-bottom:0">For engineers with an AI agent in production, or about to be.</p>
+        <div class="deal">
+          <div>
+            <h3>You get</h3>
+            <ul>
+              <li>Free for the whole beta</li>
+              <li>Setup with the founder, in 30 minutes</li>
+              <li>A real say in what we build next</li>
+            </ul>
+          </div>
+          <div>
+            <h3>We ask</h3>
+            <ul>
+              <li>One real agent, for a few weeks</li>
+              <li>Blunt feedback</li>
+            </ul>
+          </div>
         </div>
-        <div class="catches">
-          <div class="catch">
-            <span class="what">likely cause</span>
-            <h3>The change that broke it</h3>
-            <p>Every alert says when the drop started, which prompt, model or code version the bad runs share, which
-              step began failing and which deploy went out around then. Each part has to pass a significance test, or it
-              is left out.</p>
-          </div>
-          <div class="catch">
-            <span class="what">run.false_completion_rate</span>
-            <h3>"Done" that wasn't</h3>
-            <p>Agents report success while the booking never happened. Plumbline compares what the agent claimed with an
-              independent check: yours, or a judge model grading a sample of runs against your rubric.</p>
-          </div>
-          <div class="catch">
-            <span class="what">daily watcher note</span>
-            <h3>Drift below your alert lines</h3>
-            <p>Once a day it looks at what is odd but not yet alarming, such as a new version that fails more or a step
-              that started failing, and posts a short note. Every number in it comes from your data.</p>
-          </div>
-          <div class="catch">
-            <span class="what">eval gate</span>
-            <h3>Regressions before they ship</h3>
-            <p>Run your eval suite in CI and block a prompt or model change that makes things worse, with the failing
-              cases listed in the pull request.</p>
-          </div>
+        <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
+        <div class="founder">
+          <svg viewBox="0 0 18 26" aria-hidden="true"><line x1="9" y1="0" x2="9" y2="12" stroke="currentColor" stroke-width="1.6" /><path d="M4 12 h10 l-5 13 z" fill="var(--brass)" /></svg>
+          <p style="margin:0">Built by <b>Shama Keskar</b>, three-time technical cofounder and CTO, ex-Google, Amazon and LinkedIn. “Our agents kept saying ‘done’ when they weren’t. Nothing in our logs caught it, so I built Plumbline.”</p>
         </div>
       </div>
     </section>
-
-    <section>
-      <div class="wrap watcher">
-        <div class="section-head" style="margin:0">
-          <span class="label">The watcher</span>
-          <h2>A colleague who reads every dashboard.</h2>
-          <p style="color:var(--ink-2)">Founders and product leads get the note in Slack without opening anything. If
-            you connect a model, it connects the findings and says what to check first. It can only cite what Plumbline
-            found, and a point with a number that is not in the data is dropped.</p>
-        </div>
-        <figure class="message" aria-label="An example watcher note" style="margin:0">
-          <div class="head"><span><span class="dot brass"></span>2 things worth a look in the last day</span><span
-              class="example-tag">Example</span></div>
-          <div class="body">
-            <ol class="note-list">
-              <li>Prompt v9 possibly broke booking: its runs fail 25% against 8.3% on other versions, and book_slot
-                failed 24 times. Check the v9 deploy first.
-                <span class="fact">matcher started running prompt v9: 96 checked runs so far, 25% failed against 8.3% on
-                  other versions.</span>
-              </li>
-              <li>Spend was $6.24, against $2.40 in the same hours a week earlier.
-                <span class="fact">160% more, with no change in traffic.</span>
-              </li>
-            </ol>
-          </div>
-        </figure>
-      </div>
-    </section>
-
-    <section id="human-in-the-loop">
-      <div class="wrap watcher">
-        <div class="section-head" style="margin:0">
-          <span class="label">Human in the loop</span>
-          <h2>When the agent should not act alone, a person decides.</h2>
-          <p style="color:var(--ink-2)">Before a refund, an email to a customer or anything that cannot be undone, the
-            agent asks Plumbline. Your policies decide: low confidence, an amount over a limit, a guardrail block, a
-            suspected prompt injection. The right people hear at once in Slack, email or your own tool. One takes it,
-            decides, and the agent, which can wait for the answer, gets it back.</p>
-          <ul class="checks" style="margin-top:6px">
-            <li>Service levels: past the deadline the same people are told again</li>
-            <li>Time to a person, missed deadlines and whether escalating was right, all measured</li>
-            <li>One call from any framework, the SDKs, or MCP</li>
-          </ul>
-        </div>
-        <figure class="message" aria-label="An example escalation as it arrives" style="margin:0">
-          <div class="head"><span><span class="dot brass"></span>refund-bot (production) needs a person</span><span
-              class="example-tag">Example</span></div>
-          <div class="body">
-            <div class="title">Amount over limit: refund of $900 on order 1182</div>
-            <div class="cause"><b>Why:</b> $900.00 is over the $500.00 limit; the next action cannot be
-              undone.<br><b>Service level:</b> due in 15 min · not yet taken</div>
-            <div class="meta">Taken by Ana 3 minutes later. Resolved as edited: refund $450. The agent continued with
-              her decision.</div>
-          </div>
-        </figure>
-      </div>
-    </section>
-
-    <section id="accountability">
-      <div class="wrap">
-        <div class="section-head">
-          <span class="label">Accountability</span>
-          <h2>Answer for your agents without assembling the evidence by hand.</h2>
-        </div>
-        <div class="catches">
-          <div class="catch">
-            <span class="what">post-mortems</span>
-            <h3>The incident report, already written</h3>
-            <p>Every alert that turns out to be an incident gets an account from the records: a timeline, how long it
-              took to notice and to fix, how many runs went wrong beyond normal and what they cost, the likely cause,
-              and follow-ups. Drafted while it is open, posted when it closes.</p>
-          </div>
-          <div class="catch">
-            <span class="what">signed audit trail</span>
-            <h3>Proof of what your agents did</h3>
-            <p>One export with every action, guardrail check and decision, every escalation and who resolved it, and
-              every change people made. Each record is chained to the one before, and the file is signed, so a
-              customer's security review or an auditor can check that nothing was edited or removed.</p>
-          </div>
-          <div class="catch">
-            <span class="what">reliability benchmark</span>
-            <h3>How you compare</h3>
-            <p>Teams that opt in contribute to an anonymised quarterly report on how agents in production are doing.
-              Every figure needs at least five organisations behind it, and no single one can be singled out. Your
-              dashboard shows where you stand.</p>
-          </div>
-          <div class="catch">
-            <span class="what">MCP</span>
-            <h3>A tool your agents and assistants can use</h3>
-            <p>Plumbline is an MCP server. An agent asks for a person and waits for the decision; the assistant you work
-              in, such as Claude or Cursor, can explain why an alert fired, read the post-mortem, and pull the runs
-              behind it.</p>
-          </div>
-        </div>
-        <div class="snippet" aria-label="Connecting Plumbline over MCP">
-          <pre><span class="c"># Claude Code. Cursor and other MCP clients take the same URL and key.</span>
-claude mcp add --transport http plumbline https://your-plumbline/mcp \
-  --header "Authorization: Bearer $PLUMBLINE_KEY"</pre>
-        </div>
-      </div>
-    </section>
-
-    <section id="how-it-works">
-      <div class="wrap">
-        <div class="section-head">
-          <span class="label">How it works</span>
-          <h2>Three steps, most of them automatic.</h2>
-        </div>
-        <ol class="steps">
-          <li>
-            <h3>Connect your agent</h3>
-            <p>Point your framework's tracing at Plumbline, add a few lines with the TypeScript or Python SDK, or
-              connect over MCP. The dashboard's Connect page shows exactly what to paste and ticks itself off as data
-              arrives.</p>
-          </li>
-          <li>
-            <h3>It learns normal</h3>
-            <p>Plumbline computes task success, silent failures, false completions, latency, cost and more than 50 other
-              measures per agent, each day, and learns each one's usual range.</p>
-          </li>
-          <li>
-            <h3>It tells you</h3>
-            <p>When a measure moves the wrong way, your team hears about it once, with the likely cause and the runs
-              behind it. Hard failures are caught within minutes.</p>
-          </li>
-        </ol>
-        <div class="snippet" aria-label="Python example">
-          <pre><span class="c"># Python. Any OpenTelemetry exporter works too.</span>
-plumbline = Plumbline(URL, KEY, version={"prompt": "v12"})
-with plumbline.run("stylist-matcher", request_id) as run:
-    shortlist = match(request)
-    run.end("succeeded", claimed_done=True)</pre>
-        </div>
-      </div>
-    </section>
-
-    <section id="voice">
-      <div class="wrap two">
-        <div>
-          <span class="label">Voice agents</span>
-          <h2>Phone agents get worse in their own ways.</h2>
-          <p style="color:var(--ink-2)">Plumbline watches calls from Vapi, Retell, Pipecat, LiveKit or your own stack,
-            and tracks what only calls have.</p>
-        </div>
-        <div>
-          <ul class="checks">
-            <li>A quality score out of 100 for every call, with the moments that cost points marked in the transcript
-            </li>
-            <li>How long callers wait for each reply, and calls with dead air over 3 seconds</li>
-            <li>Callers who hang up in the first few seconds</li>
-            <li>Transfers to a person, frustrated callers, and callers who had to repeat themselves</li>
-            <li>Cost per minute</li>
-            <li>The agent version behind a change, picked up automatically from Retell</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap two">
-        <div>
-          <span class="label">Works with</span>
-          <h2>The stack you already have.</h2>
-          <ul class="stack" aria-label="Supported frameworks and platforms">
-            <li>LangGraph</li>
-            <li>LangChain</li>
-            <li>OpenAI Agents SDK</li>
-            <li>CrewAI</li>
-            <li>LlamaIndex</li>
-            <li>Vercel AI SDK</li>
-            <li>OpenTelemetry</li>
-            <li>MCP (Claude, Cursor)</li>
-            <li>Vapi</li>
-            <li>Retell</li>
-            <li>Pipecat</li>
-            <li>LiveKit Agents</li>
-            <li>Slack</li>
-            <li>Webhooks</li>
-          </ul>
-        </div>
-        <div>
-          <span class="label">Built for</span>
-          <h2>Founders, Leaders & Companies shipping agents to real customers.</h2>
-          <ul class="checks">
-            <li>Teams without a dedicated evaluation or ML platform group</li>
-            <li>Your data stays in your own Postgres; prompts and outputs are not stored unless you choose to grade them
-            </li>
-            <li>Alerts that fire together arrive as one message, not a dozen pings</li>
-            <li>Set up in the browser: no config files to learn before you see value</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="why">
-      <div class="wrap founder">
-        <div class="section-head" style="margin:0">
-          <span class="label">Why I built it</span>
-          <p class="quote">"The failures that hurt us never threw an error."</p>
-        </div>
-        <div class="body">
-          <p>I'm a technical cofounder and CTO for a FashionTech Startup. While building our own multi-agent system, I
-            kept seeing agents fail silently. A run would say "done" when the agent hadn't actually done the thing.
-            Quality would drift over a few weeks with nobody noticing. An agent would be about to take a risky action
-            with no one checking. Logs never caught any of it.</p>
-          <p>So I built Plumbline for us: something that checks whether the job was really done, says what changed when
-            quality slips, and puts a person in front of the decisions an agent shouldn't make alone. Once I saw how
-            much it caught, I decided to make it available to every team shipping agents.</p>
-          <div class="sig"><strong>Shama Keskar</strong><span>Founder of Plumbline · technical cofounder and CTO ·
-              ex-Google, Amazon, LinkedIn · took agents to production at an AI-native retail startup and an
-              accessibility startup</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="beta">
-      <div class="wrap">
-        <div class="section-head">
-          <span class="label">Beta testers wanted</span>
-          <h2>Try Plumbline free on one of your agents.</h2>
-        </div>
-        <p class="lede">We're inviting a small group of engineers and engineering leaders with an AI agent in production, or about to
-          be, to use Plumbline free and tell us honestly what's missing.</p>
-        <ul class="checks" style="margin-top:24px">
-          <li>Free for the whole beta, 60 to 90 days</li>
-          <li>A 30-minute setup call with Shama, then a few weeks on one real agent</li>
-          <li>A direct line to the founder, and a real say in what gets built next</li>
-          <li>Runs in your own cloud: your data stays yours</li>
-        </ul>
-        <p style="margin-top:28px"><a class="cta" data-signup href="https://forms.gle/v61cAjbzKYTn7Ci59">Apply to be a beta tester</a></p>
-      </div>
-    </section>
-
   </main>
 
   <footer>
     <div class="wrap">
-      <span>Plumbline · Quality monitoring for AI agents · built by <a href="https://shamavox.github.io/">Shama
-          Keskar</a></span>
-      <span><a href="https://github.com/shamavox/plumbline" rel="noopener">GitHub</a> · © 2026 Styled By and Shama AI Ventures LLC</span>
+      <span>Plumbline · <a href="tour.html">The full tour</a> · <a href="https://www.linkedin.com/in/shamakeskar/" rel="noopener">Shama on LinkedIn</a></span>
+      <span>© 2026 Styled By and Shama AI Ventures LLC</span>
     </div>
   </footer>
-
-  <script>
-    // Sign-up target: the beta tester form.
-    //   SIGNUP_URL     a form you control (Tally, Google Forms, Typeform)
-    //   CONTACT_EMAIL  opens an email to you with the subject and questions filled in
-    //   CONTACT_URL    your LinkedIn or X profile, for a direct message
-    // Until one is set, the buttons say early access opens soon instead of leading nowhere.
-    const SIGNUP_URL = "https://forms.gle/v61cAjbzKYTn7Ci59";
-    const CONTACT_EMAIL = "";
-    const CONTACT_URL = "";
-
-    const subject = "Plumbline";
-    const body = "Hi Shama,\n\nWhat our agents do:\n\nWhat has gone wrong so far:\n\nHow many runs a day, roughly:\n";
-    const mail = CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : "";
-    const target = SIGNUP_URL || mail || CONTACT_URL;
-    for (const a of document.querySelectorAll("[data-signup]")) {
-      if (target) {
-        a.href = target;
-        if (!target.startsWith("mailto:")) { a.target = "_blank"; a.rel = "noopener"; }
-      } else {
-        const span = document.createElement("span");
-        span.className = "cta soon";
-        span.textContent = "Early access opens soon";
-        a.replaceWith(span);
-      }
-    }
-    // With a form as the main route, also offer the quicker one.
-    const alt = document.querySelector("[data-contact-alt]");
-    if (alt && SIGNUP_URL && (CONTACT_EMAIL || CONTACT_URL)) {
-      const link = document.createElement("a");
-      link.href = mail || CONTACT_URL;
-      link.textContent = CONTACT_EMAIL ? CONTACT_EMAIL : "send me a message";
-      if (!mail) { link.target = "_blank"; link.rel = "noopener"; }
-      alt.append("Rather just write? ", link, ".");
-      alt.hidden = false;
-    }
-  </script>
 </body>
 
 </html>
