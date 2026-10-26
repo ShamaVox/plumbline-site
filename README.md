@@ -1,6 +1,6 @@
 # Plumbline
 
-Copyright 2026 [Styled By and Shama AI Ventures LLC]
+Copyright 2026 Styled By and Shama AI Ventures LLC
 
 Quality monitoring for AI agents in production.
 
@@ -10,6 +10,8 @@ names the likely cause. When an agent shouldn't act alone, it asks a person and 
 blocks regressions in CI before they ship.
 
 **Website and 2-minute demo:** https://shamavox.github.io/plumbline-site/
+
+**Become a beta tester:** https://forms.gle/v61cAjbzKYTn7Ci59
 
 **Source:** https://github.com/shamavox/plumbline (self-host it free; see its LICENSING.md)
 
