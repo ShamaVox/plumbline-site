@@ -103,6 +103,13 @@
     .deal div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
     .deal h3 { font: 700 .8rem var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--brass); margin: 0 0 8px; }
     .deal ul { margin: 0; padding-left: 18px; color: var(--ink-2); }
+    .nda-note { display: flex; gap: 8px; align-items: center; margin: 14px 0 0; font-size: .92rem; color: var(--ink-2); }
+    .nda-note svg { flex: none; width: 15px; height: 15px; color: var(--brass); }
+    .join { list-style: none; counter-reset: j; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0; margin: 0 0 26px; }
+    .join li { counter-increment: j; border-top: 2px solid var(--line); padding-top: 12px; color: var(--ink-2); font-size: .95rem; }
+    .join li::before { content: counter(j); display: block; font: 700 .8rem var(--mono); color: var(--brass); margin-bottom: 4px; }
+    .join li b { display: block; color: var(--ink); }
+    .join li.key { border-top-color: var(--brass); }
     .founder { display: flex; gap: 14px; align-items: flex-start; margin-top: 34px; color: var(--ink-2); font-size: .98rem; max-width: 62ch; }
     .founder svg { flex: none; width: 16px; height: 24px; margin-top: 4px; color: var(--ink); }
     .founder b { color: var(--ink); }
@@ -113,6 +120,7 @@
 
     @media (max-width: 760px) {
       .three, .deal { grid-template-columns: 1fr; }
+      .join { grid-template-columns: 1fr 1fr; }
       header nav .hide-sm { display: none; }
       .hero { padding-top: 32px; }
       .term { font-size: 12.5px; }
@@ -145,6 +153,7 @@
           <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
           <a class="ghost" href="#demo">Watch the 2-minute demo</a>
         </div>
+        <p class="nda-note"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Invite only. Approved teams sign a short mutual NDA online before getting access. <a href="#beta">How joining works</a></span></p>
       </div>
     </section>
 
@@ -195,7 +204,7 @@ claims-review v1.2.0  [ci]
     <span class="ok">✓</span> tag:injection     1 of 1 passed
 <span class="p">$</span> echo $?
 1</div>
-        <p class="stack">Works with OpenAI Agents SDK, LangGraph, CrewAI, Vercel AI SDK, OpenTelemetry and MCP. Alerts in Slack or email. Runs in your own cloud.</p>
+        <p class="stack">Works with OpenAI Agents SDK, LangGraph, CrewAI, Vercel AI SDK, OpenTelemetry and MCP. Alerts in Slack or email.</p>
       </div>
     </section>
 
@@ -217,10 +226,17 @@ claims-review v1.2.0  [ci]
             <ul>
               <li>One real agent, for a few weeks</li>
               <li>Blunt feedback</li>
-              <li>A short mutual NDA (it protects you too)</li>
+              <li>A mutual NDA before access</li>
             </ul>
           </div>
         </div>
+        <h3 style="font:700 .8rem var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--brass);margin:0 0 10px">How joining works</h3>
+        <ol class="join">
+          <li><b>Request access</b>Two-minute form.</li>
+          <li><b>Quick intro</b>We check it's a fit, usually within a few days.</li>
+          <li class="key"><b>Sign the mutual NDA</b>A short e-sign. It protects you too.</li>
+          <li><b>Get access</b>Setup with Shama in 30 minutes.</li>
+        </ol>
         <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
         <div class="founder">
           <svg viewBox="0 0 18 26" aria-hidden="true"><line x1="9" y1="0" x2="9" y2="12" stroke="currentColor" stroke-width="1.6" /><path d="M4 12 h10 l-5 13 z" fill="var(--brass)" /></svg>

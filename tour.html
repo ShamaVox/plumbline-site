@@ -643,6 +643,11 @@
       background: var(--brass);
     }
 
+    .join { counter-reset: j; }
+    .join li { counter-increment: j; padding-left: 30px; }
+    .join li::before { content: counter(j); width: auto; height: auto; background: none; top: 0; color: var(--brass); font-weight: 700; font-family: var(--mono, monospace); }
+    .join li:nth-child(3) strong { color: var(--brass); }
+
     .access {
       text-align: left;
     }
@@ -1014,7 +1019,7 @@
             <a class="cta" href="#beta">Become a beta tester</a>
             <a class="ghost" href="#demo">Watch the 2-minute demo</a>
           </div>
-          <p class="hero-note">Private beta. Runs on your own Postgres. Set up in an afternoon.</p>
+          <p class="hero-note">Private beta, invite only. Approved teams sign a short mutual NDA online before getting access.</p>
         </div>
 
         <figure class="message" aria-label="An example alert as it arrives in Slack" style="margin:0">
@@ -1195,11 +1200,6 @@
               behind it.</p>
           </div>
         </div>
-        <div class="snippet" aria-label="Connecting Plumbline over MCP">
-          <pre><span class="c"># Claude Code. Cursor and other MCP clients take the same URL and key.</span>
-claude mcp add --transport http plumbline https://your-plumbline/mcp \
-  --header "Authorization: Bearer $PLUMBLINE_KEY"</pre>
-        </div>
       </div>
     </section>
 
@@ -1227,13 +1227,6 @@ claude mcp add --transport http plumbline https://your-plumbline/mcp \
               behind it. Hard failures are caught within minutes.</p>
           </li>
         </ol>
-        <div class="snippet" aria-label="Python example">
-          <pre><span class="c"># Python. Any OpenTelemetry exporter works too.</span>
-plumbline = Plumbline(URL, KEY, version={"prompt": "v12"})
-with plumbline.run("support-agent", request_id) as run:
-    shortlist = match(request)
-    run.end("succeeded", claimed_done=True)</pre>
-        </div>
       </div>
     </section>
 
@@ -1286,8 +1279,7 @@ with plumbline.run("support-agent", request_id) as run:
           <h2>Founders, Leaders & Companies shipping agents to real customers.</h2>
           <ul class="checks">
             <li>Teams without a dedicated evaluation or ML platform group</li>
-            <li>Your data stays in your own Postgres; prompts and outputs are not stored unless you choose to grade them
-            </li>
+            <li>Your data stays yours; prompts and outputs are not stored unless you choose to grade them</li>
             <li>Alerts that fire together arrive as one message, not a dozen pings</li>
             <li>Set up in the browser: no config files to learn before you see value</li>
           </ul>
@@ -1328,9 +1320,15 @@ with plumbline.run("support-agent", request_id) as run:
           <li>Free for the whole beta, 60 to 90 days</li>
           <li>A 30-minute setup call with Shama, then a few weeks on one real agent</li>
           <li>A direct line to the founder, and a real say in what gets built next</li>
-          <li>Runs in your own cloud: your data stays yours</li>
-          <li>Selected teams sign a short mutual NDA before getting access; it protects your data as much as ours</li>
+          <li>Your data stays yours</li>
         </ul>
+        <h3 style="margin:32px 0 10px">How joining works</h3>
+        <ol class="checks join">
+          <li><strong>Request access</strong> with a two-minute form.</li>
+          <li><strong>Quick intro</strong> so we can check it's a fit, usually within a few days.</li>
+          <li><strong>Sign a short mutual NDA</strong> online. It protects your data as much as ours.</li>
+          <li><strong>Get access</strong> and set up with Shama in 30 minutes.</li>
+        </ol>
         <p style="margin-top:28px"><a class="cta" data-signup href="https://forms.gle/v61cAjbzKYTn7Ci59">Apply to be a beta tester</a></p>
       </div>
     </section>
