@@ -6,18 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Plumbline · The full tour</title>
   <meta name="description"
-    content="Plumbline watches AI agents in production. When quality slips, it tells your team and names the likely cause. When an agent should not act alone, it hands the moment to a person. And it keeps a signed record of everything agents did.">
+    content="Outcome assurance for AI agents in production. Plumbline checks that agents actually got the job done, stops risky actions before they happen, turns incidents into fixes you approve, and keeps signed proof of it all.">
   <!-- Link previews (LinkedIn, Slack, X, Discord). If the address changes (a custom domain), change it here and in og:image. -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Plumbline: know when your AI agent gets worse, and why">
+  <meta property="og:title" content="Plumbline: know your AI agent actually did the job">
   <meta property="og:description"
-    content="Quality monitoring for AI agents in production: alerts that name the likely cause, a person in the loop when it matters, post-mortems written for you, and a signed audit trail.">
+    content="Outcome assurance for AI agents: checks before risky actions, an estimate of the failures nobody reviewed, fixes you approve, and a signed reliability report per agent.">
   <meta property="og:url" content="https://plumbline.shamakeskar.com/tour.html">
   <meta property="og:image" content="https://plumbline.shamakeskar.com/og.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Plumbline: know when your AI agent gets worse, and why">
+  <meta name="twitter:title" content="Plumbline: know your AI agent actually did the job">
   <meta name="twitter:description"
     content="Catches what logs miss: agents saying &quot;done&quot; when they weren't, quality drifting for weeks, risky actions nobody approved.">
   <meta name="twitter:image" content="https://plumbline.shamakeskar.com/og.png">
@@ -986,6 +986,7 @@
       <nav class="links" aria-label="Sections">
         <a href="#demo">Demo</a>
         <a href="#what-it-catches">What it catches</a>
+        <a href="#in-the-path" class="hide-sm">In the path</a>
         <a href="#human-in-the-loop" class="hide-sm">Human in the loop</a>
         <a href="#accountability" class="hide-sm">Accountability</a>
         <a href="#how-it-works" class="hide-sm">How it works</a>
@@ -1010,11 +1011,11 @@
               </svg>
             </div>
           </div>
-          <span class="label">Quality monitoring for AI agents</span>
-          <h1>Know when your agent gets worse, and why.</h1>
-          <p class="lede">Plumbline watches your AI agents in production. When quality slips, it tells your team in
-            Slack or email and names the likely cause: the prompt version, the failing step, the deploy. When an agent
-            should not act alone, it hands the moment to a person and gives the agent their decision.</p>
+          <span class="label">Outcome assurance for AI agents</span>
+          <h1>Know your agent actually did the job.</h1>
+          <p class="lede">Your tracing shows what the agent did. Plumbline checks whether it actually got done: it stops
+            risky actions before they happen, tells your team in Slack or email when quality slips and names the likely
+            cause, and turns every incident into a fix you approve.</p>
           <div class="hero-actions">
             <a class="cta" href="#beta">Become a beta tester</a>
             <a class="ghost" href="#demo">Watch the 2-minute demo</a>
@@ -1044,7 +1045,7 @@
         </div>
         <div class="frame">
           <video controls playsinline preload="none" poster="media/plumbline-demo-poster.jpg"
-            aria-label="Plumbline demo: alerts with a likely cause, a person deciding a risky refund, and a CI eval gate blocking a regression">
+            aria-label="Plumbline demo: alerts with a likely cause, a person deciding a risky refund, and a regression caught before it ships">
             <source src="media/plumbline-demo.mp4" type="video/mp4">
             <a href="media/plumbline-demo.mp4">Download the demo video</a>
           </video>
@@ -1098,10 +1099,46 @@
               that started failing, and posts a short note. Every number in it comes from your data.</p>
           </div>
           <div class="catch">
-            <span class="what">eval gate</span>
-            <h3>Regressions before they ship</h3>
-            <p>Run your eval suite in CI and block a prompt or model change that makes things worse, with the failing
-              cases listed in the pull request.</p>
+            <span class="what">incident to fix</span>
+            <h3>The same failure, never twice</h3>
+            <p>The runs behind each incident become tests. A fix is proposed, checked against them and opened as a pull
+              request. A person merges it; Plumbline never does.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="in-the-path">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="label">In the path, not just on a dashboard</span>
+          <h2>Stop it, estimate it, fix it, prove it.</h2>
+        </div>
+        <div class="catches">
+          <div class="catch">
+            <span class="what">before it acts</span>
+            <h3>Stop it before it acts</h3>
+            <p>Before a refund, a booking or an email goes out, the agent asks. Plumbline checks the action against
+              your rules and the evidence, and answers go ahead, stop, or a person decides. Start in shadow mode to see
+              what it would have held.</p>
+          </div>
+          <div class="catch">
+            <span class="what">every run</span>
+            <h3>See what nobody checked</h3>
+            <p>A model of your own verified runs scores every run, so you see how many “done”s were probably false,
+              not just in the handful someone reviewed.</p>
+          </div>
+          <div class="catch">
+            <span class="what">autopilot</span>
+            <h3>Fixes you approve</h3>
+            <p>An incident starts the fix in your own CI and ends as a pull request for you to review. Each month, one
+              line: how many incidents got a verified fix, and how many you approved.</p>
+          </div>
+          <div class="catch">
+            <span class="what">signed</span>
+            <h3>Proof for auditors</h3>
+            <p>A signed reliability report per agent: outcomes, human oversight, what was held back, incidents and how
+              they closed. Anyone can verify it.</p>
           </div>
         </div>
       </div>
@@ -1337,7 +1374,7 @@
 
   <footer>
     <div class="wrap">
-      <span>Plumbline · Quality monitoring for AI agents · built by <a href="https://shamavox.github.io/">Shama
+      <span>Plumbline · Outcome assurance for AI agents · built by <a href="https://shamavox.github.io/">Shama
           Keskar</a></span>
       <span>© 2026 Styled By and Shama AI Ventures LLC</span>
     </div>

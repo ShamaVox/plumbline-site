@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Plumbline · Private beta</title>
-  <meta name="description" content="Agents don't throw exceptions. Plumbline does. It catches AI agents that say &quot;done&quot; when they aren't, tells you what changed, and turns every incident into a test. Private beta.">
+  <title>Plumbline · Outcome assurance for AI agents · Private beta</title>
+  <meta name="description" content="Agents don't throw exceptions. Plumbline does. It checks that AI agents actually got the job done, stops risky actions before they happen, and turns every incident into a fix you approve. Private beta.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Plumbline: agents don't throw exceptions. Plumbline does.">
   <meta property="og:description" content="Catch AI agents that say &quot;done&quot; when they aren't. Private beta, onboarding a few teams.">
@@ -88,6 +88,8 @@
     .three div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
     .three h3 { font: 700 1.1rem var(--display); margin: 0 0 6px; }
     .three p { margin: 0; color: var(--ink-2); font-size: .98rem; }
+    .three.four { grid-template-columns: repeat(4, 1fr); }
+    @media (max-width: 1000px) { .three.four { grid-template-columns: 1fr 1fr; } }
 
     /* Terminal */
     .term-wrap { padding: 0 0 48px; }
@@ -119,7 +121,7 @@
     footer a { color: var(--ink-2); }
 
     @media (max-width: 760px) {
-      .three, .deal { grid-template-columns: 1fr; }
+      .three, .deal, .three.four { grid-template-columns: 1fr; }
       .join { grid-template-columns: 1fr 1fr; }
       header nav .hide-sm { display: none; }
       .hero { padding-top: 32px; }
@@ -148,7 +150,7 @@
       <div class="wrap">
         <span class="pill"><span class="dot" aria-hidden="true"></span>Private beta · onboarding a few teams</span>
         <h1>Agents don't throw exceptions. <em>Plumbline does.</em></h1>
-        <p class="lede">Your agent said “done.” Plumbline checks whether it was, tells you what changed when it wasn’t, and turns every incident into a test.</p>
+        <p class="lede">Your agent said “done.” Plumbline checks whether it was, stops it before it acts on a bad call, and turns every incident into a fix you approve.</p>
         <div class="actions">
           <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
           <a class="ghost" href="#demo">Watch the 2-minute demo</a>
@@ -161,7 +163,7 @@
       <div class="wrap">
         <div class="frame">
           <video controls playsinline preload="metadata" poster="media/plumbline-demo-poster.jpg"
-            aria-label="Plumbline demo: an alert with its likely cause, a person approving a risky refund, and a CI gate blocking a regression">
+            aria-label="Plumbline demo: an alert with its likely cause, a person approving a risky refund, and a regression caught before it ships">
             <source src="media/plumbline-demo.mp4" type="video/mp4">
             <a href="media/plumbline-demo.mp4">Download the demo video</a>
           </video>
@@ -171,40 +173,41 @@
     </section>
 
     <section aria-label="What it does">
-      <div class="wrap three">
+      <div class="wrap three four">
       <div>
-        <h3>Catch silent failures</h3>
-        <p>Checks whether the job actually got done, not whether the agent returned 200.</p>
+        <h3>Stop it before it acts</h3>
+        <p>Risky actions are checked first. When it matters, a person decides.</p>
       </div>
       <div>
-        <h3>Know what changed</h3>
-        <p>Every alert names the likely cause: the prompt, the model, the deploy.</p>
+        <h3>See what nobody checked</h3>
+        <p>An estimate of the false “done”s across every run, not just the few you review.</p>
       </div>
       <div>
-        <h3>Never ship it twice</h3>
-        <p>Every production failure becomes a regression test in your CI.</p>
+        <h3>Fixes you approve</h3>
+        <p>Every incident becomes a test and a pull request. You merge it, or you don’t.</p>
+      </div>
+      <div>
+        <h3>Proof for auditors</h3>
+        <p>A signed reliability report per agent, ready for the questions that come later.</p>
       </div>
       </div>
     </section>
 
     <section class="term-wrap">
       <div class="wrap">
-        <h2>A bad prompt change, blocked in CI.</h2>
-        <div class="term" role="img" aria-label="Terminal: plumbline eval run fails the gate because three cases that passed at baseline now fail"><span class="p">$</span> <span class="b">plumbline eval run evals/claims-review.yaml</span>
-claims-review v1.2.0  [ci]
-  pass rate     62.5%  (5 of 8)
+        <h2>A bad refund, held before it happened.</h2>
+        <div class="term" role="img" aria-label="Plumbline holds a 500 dollar refund for a person because it is over the limit and more than the order was worth"><span class="p">agent</span>  <span class="b">refund.issue</span>  $500.00  order A-1093
+<span class="p">plumbline</span>  <span class="x b">HELD FOR A PERSON</span>  (4 ms)
+  <span class="x">✗</span> amount     $500.00 is over the $200.00 limit
+  <span class="x">✗</span> evidence   refund ($500.00) is more than the order total ($40.00)
+  <span class="ok">✓</span> claim      the agent reports the task done
+  <span class="ok">✓</span> run        no failed steps, no guardrail block
 
-  Failing results (3):
-    <span class="x">✗</span> press    label: expected "flagged", got "clean"
-    <span class="x">✗</span> clients  label: expected "flagged", got "clean"
-    <span class="x">✗</span> degree   label: expected "flagged", got "clean"
+  → #support-oncall: approve, edit or reject   due in 10 min
 
-  Gate: <span class="x b">FAILED</span>  (baseline 100.0%)
-    <span class="x">✗</span> max_new_failures  now failing: clients, degree, press
-    <span class="ok">✓</span> tag:injection     1 of 1 passed
-<span class="p">$</span> echo $?
-1</div>
-        <p class="stack">Works with OpenAI Agents SDK, LangGraph, CrewAI, Vercel AI SDK, OpenTelemetry and MCP. Alerts in Slack or email.</p>
+<span class="p">later</span>   Plumbline estimates 31 false “done”s this week in runs nobody reviewed.
+        3 incidents became fixes; you merged 2.</div>
+        <p class="stack">Works alongside the stack you already have: OpenAI Agents SDK, LangGraph, CrewAI, Vercel AI SDK, OpenTelemetry and MCP. Keep your tracing; Plumbline checks the outcome. Alerts in Slack or email.</p>
       </div>
     </section>
 
