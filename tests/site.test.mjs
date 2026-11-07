@@ -40,3 +40,22 @@ for (const [name, src] of Object.entries(pages)) {
     assert.doesNotMatch(src, /lorem|ipsum|TODO|FIXME|\$\$|\[getStyledBy/i);
   });
 }
+
+test('index.html: the problem is shown with real, sourced incidents, right after the hero', () => {
+  const src = pages['index.html'];
+  const strip = src.match(/<section class="incidents"[\s\S]*?<\/section>/);
+  assert.ok(strip, 'incidents strip is missing');
+  assert.ok(src.indexOf('class="incidents"') < src.indexOf('id="demo"'), 'incidents must come before the demo');
+  // Every incident and the statistic link to a published source.
+  const links = [...strip[0].matchAll(/<a href="(https:\/\/[^"]+)" target="_blank" rel="noopener noreferrer">/g)].map((m) => m[1]);
+  assert.equal(links.length, 4);
+  for (const host of ['cbsnews.com', 'fortune.com', 'cxtoday.com', 'thestar.com.my']) assert.ok(links.some((l) => l.includes(host)), `no source from ${host}`);
+  // No invented money figures: claims stay as reported.
+  assert.doesNotMatch(strip[0], /\$\s?\d/);
+});
+
+test('tour.html: the problem section cites the same incidents', () => {
+  const problem = tour.match(/<section class="problem">[\s\S]*?<\/section>/)[0];
+  for (const name of ['Air Canada, 2024', 'Replit, 2025', 'Cursor, 2025']) assert.match(problem, new RegExp(name));
+  assert.match(problem, /None of them threw an error/);
+});

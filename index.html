@@ -99,6 +99,17 @@
     .term .p { color: var(--term-dim); } .term .x { color: #ef6f5f; } .term .ok { color: #4cc483; } .term .b { font-weight: 600; }
     .stack { color: var(--ink-2); font-size: .95rem; margin-top: 14px; }
 
+    /* Real incidents */
+    .incidents { padding: 8px 0 40px; }
+    .incidents h2 { font: 800 clamp(1.4rem, 3vw, 1.8rem)/1.2 var(--display); margin: 0 0 6px; }
+    .incidents .sub { color: var(--ink-2); margin: 0 0 18px; }
+    .incidents ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .incidents li { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--brass); border-radius: 12px; padding: 16px 18px; color: var(--ink-2); font-size: .97rem; }
+    .incidents li b { display: block; color: var(--ink); margin-bottom: 4px; }
+    .incidents li a { color: var(--ink-2); font-size: .85rem; }
+    .incidents .stat { margin: 18px 0 0; color: var(--ink-2); font-size: .97rem; }
+    @media (max-width: 760px) { .incidents ol { grid-template-columns: 1fr; } }
+
     /* Beta */
     .beta { padding: 40px 0 56px; border-top: 1px solid var(--line); }
     .deal { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 26px; }
@@ -156,6 +167,19 @@
           <a class="ghost" href="#demo">Watch the 2-minute demo</a>
         </div>
         <p class="nda-note"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Invite only. Approved teams sign a short mutual NDA online before getting access. <a href="#beta">How joining works</a></span></p>
+      </div>
+    </section>
+
+    <section class="incidents" aria-labelledby="incidents-h">
+      <div class="wrap">
+        <h2 id="incidents-h">None of these threw an error.</h2>
+        <p class="sub">The agent said it was fine. The logs saw a 200. Customers found out first.</p>
+        <ol>
+          <li><b>An airline’s chatbot invented a refund policy.</b> A tribunal made the airline honor it, ruling the company is responsible for what its chatbot says. <a href="https://www.cbsnews.com/news/aircanada-chatbot-discount-customer" target="_blank" rel="noopener noreferrer">Air Canada, 2024</a></li>
+          <li><b>A coding agent deleted a production database.</b> It happened during a code freeze, and the agent said the data could not be recovered. <a href="https://fortune.com/2025/07/23/ai-coding-tool-replit-wiped-database-called-it-a-catastrophic-failure" target="_blank" rel="noopener noreferrer">Replit, 2025</a></li>
+          <li><b>A support agent made up a policy that didn’t exist.</b> Customers cancelled in public before anyone corrected it. <a href="https://cxtoday.com/a-contact-center-chatbot-invents-company-policies-now-customers-want-out" target="_blank" rel="noopener noreferrer">Cursor, 2025</a></li>
+        </ol>
+        <p class="stat">Gartner expects over 40% of agentic AI projects to be cancelled by the end of 2027, citing costs, unclear value and weak risk controls. <a href="https://www.thestar.com.my/tech/tech-news/2025/06/25/over-40-of-agentic-ai-projects-will-be-scrapped-by-2027-gartner-says" target="_blank" rel="noopener noreferrer">Source</a></p>
       </div>
     </section>
 
