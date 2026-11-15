@@ -45,7 +45,11 @@ test('index.html: the problem is shown with real, sourced incidents, right after
   const src = pages['index.html'];
   const strip = src.match(/<section class="incidents"[\s\S]*?<\/section>/);
   assert.ok(strip, 'incidents strip is missing');
-  assert.ok(src.indexOf('class="incidents"') < src.indexOf('id="demo"'), 'incidents must come before the demo');
+  // The problem comes straight after the hero (which holds the demo video), before anything about the product.
+  const heroEnd = src.indexOf('</section>', src.indexOf('class="hero"'));
+  assert.ok(heroEnd < src.indexOf('class="incidents"'), 'incidents must come after the hero');
+  assert.ok(src.indexOf('class="incidents"') < src.indexOf('id="loop"'), 'incidents must come before the product sections');
+  assert.ok(src.indexOf('id="demo"') < heroEnd, 'the demo video sits in the hero');
   // Every incident and the statistic link to a published source.
   const links = [...strip[0].matchAll(/<a href="(https:\/\/[^"]+)" target="_blank" rel="noopener noreferrer">/g)].map((m) => m[1]);
   assert.equal(links.length, 4);
@@ -58,4 +62,41 @@ test('tour.html: the problem section cites the same incidents', () => {
   const problem = tour.match(/<section class="problem">[\s\S]*?<\/section>/)[0];
   for (const name of ['Air Canada, 2024', 'Replit, 2025', 'Cursor, 2025']) assert.match(problem, new RegExp(name));
   assert.match(problem, /None of them threw an error/);
+});
+
+test('index.html: the reliability loop is five accessible tabs, readable without JavaScript', () => {
+  const src = pages['index.html'];
+  const tabs = [...src.matchAll(/<button role="tab" id="([^"]+)" aria-controls="([^"]+)"/g)];
+  assert.equal(tabs.length, 5);
+  for (const [, tab, panel] of tabs) {
+    assert.match(src, new RegExp(`<div class="panel" role="tabpanel" id="${panel}" aria-labelledby="${tab}">`), `${panel} missing`);
+  }
+  // Panels are not hidden in the markup: without the script every step shows. The tab list itself starts hidden.
+  assert.doesNotMatch(src, /role="tabpanel"[^>]*hidden/);
+  assert.match(src, /<div class="tabs" role="tablist"[^>]*hidden>/);
+  // Example figures are labelled as such.
+  assert.match(src, /Figures are illustrative/);
+});
+
+test('index.html: no social proof the beta does not have yet', () => {
+  const src = pages['index.html'];
+  assert.doesNotMatch(src, /trusted by|used by|\bour customers|testimonial|fortune 500|SOC 2 (certified|compliant|type)/i);
+  // "1,200+ customers", "50 companies": counts we cannot back yet. (Case-sensitive: "a 200. Customers found out" is prose.)
+  assert.doesNotMatch(src, /\b\d[\d,]*\+? (customers|companies|teams)\b/);
+});
+
+test('index.html: never leads with "free"; the beta\'s cost is mentioned once, in the beta section', () => {
+  const src = pages['index.html'];
+  const hero = src.slice(src.indexOf('class="hero"'), src.indexOf('</section>', src.indexOf('class="hero"')));
+  assert.doesNotMatch(hero + src.match(/<title>[^<]*<\/title>/)[0], /\bfree\b/i);
+  const beta = src.match(/<section class="beta"[\s\S]*?<\/section>/)[0];
+  assert.match(beta, /No cost for the whole beta/);
+  assert.equal((src.match(/\bfree\b|no cost/gi) ?? []).length, 1);
+});
+
+test('index.html: FAQ answers the first questions, and the NDA is visible from the hero', () => {
+  const src = pages['index.html'];
+  const faq = src.match(/<section class="faq"[\s\S]*?<\/section>/)[0];
+  for (const q of ['change our code', 'replace our tracing', 'What do you store', 'unreachable', 'NDA']) assert.match(faq, new RegExp(q));
+  assert.match(src.slice(0, src.indexOf('class="incidents"')), /mutual NDA/);
 });

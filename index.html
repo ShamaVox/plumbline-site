@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Plumbline · Outcome assurance for AI agents · Private beta</title>
+  <title>Plumbline · Agents don't throw exceptions. Plumbline does.</title>
   <meta name="description" content="Agents don't throw exceptions. Plumbline does. It checks that AI agents actually got the job done, stops risky actions before they happen, and turns every incident into a fix you approve. Private beta.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Plumbline: agents don't throw exceptions. Plumbline does.">
@@ -27,7 +27,8 @@
     :root {
       --bg: #f4f6f7; --surface: #ffffff; --ink: #15202b; --ink-2: #4a5866; --line: rgba(21, 32, 43, 0.12);
       --brass: #9a6418; --brass-soft: rgba(154, 100, 24, 0.10); --bad: #c23a2b; --good: #1d7a46;
-      --term-bg: #0f161c; --term-ink: #dfe6ea; --term-dim: #7f909d;
+      --band: #0f161c; --band-2: #16212a; --band-ink: #e7ecef; --band-ink-2: #9fb0bd; --band-line: rgba(231, 236, 239, 0.12); --band-brass: #d9a24f;
+      --term-bg: #0a1015; --term-ink: #dfe6ea; --term-dim: #7f909d;
       --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
       --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
       --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -37,26 +38,32 @@
       :root:not([data-theme="light"]) {
         --bg: #0f161c; --surface: #16212a; --ink: #e7ecef; --ink-2: #9fb0bd; --line: rgba(231, 236, 239, 0.12);
         --brass: #d9a24f; --brass-soft: rgba(217, 162, 79, 0.12); --bad: #ef6f5f; --good: #4cc483;
-        --term-bg: #0a1015; color-scheme: dark;
+        --band: #0a1015; --band-2: #121b22; color-scheme: dark;
       }
     }
     :root[data-theme="dark"] {
       --bg: #0f161c; --surface: #16212a; --ink: #e7ecef; --ink-2: #9fb0bd; --line: rgba(231, 236, 239, 0.12);
       --brass: #d9a24f; --brass-soft: rgba(217, 162, 79, 0.12); --bad: #ef6f5f; --good: #4cc483;
-      --term-bg: #0a1015; color-scheme: dark;
+      --band: #0a1015; --band-2: #121b22; color-scheme: dark;
     }
     * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
     body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); }
     a { color: inherit; }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-left, 0px)); }
+    section { scroll-margin-top: 72px; }
+    .eyebrow { font: 600 .78rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--brass); margin: 0 0 10px; }
+    h2 { font: 800 clamp(1.7rem, 3.8vw, 2.5rem)/1.1 var(--display); font-stretch: 94%; letter-spacing: -.01em; margin: 0 0 12px; }
+    .sub { color: var(--ink-2); margin: 0 0 28px; max-width: 60ch; font-size: 1.05rem; }
+    :focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; border-radius: 4px; }
 
     /* Top bar */
-    header { padding: 18px 0; }
-    header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    header { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+    header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 12px; padding-bottom: 12px; }
     .mark { display: inline-flex; align-items: center; gap: 9px; font: 800 1.15rem var(--display); text-decoration: none; }
     .mark svg { width: 14px; height: 21px; color: var(--ink); }
-    header nav { display: flex; align-items: center; gap: 20px; font-size: .95rem; }
+    header nav { display: flex; align-items: center; gap: 22px; font-size: .95rem; }
     header nav a { text-decoration: none; color: var(--ink-2); }
     header nav a:hover { color: var(--ink); }
 
@@ -64,84 +71,137 @@
     .cta { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: var(--bg); text-decoration: none;
       font-weight: 700; padding: 13px 22px; border-radius: 999px; border: 0; }
     .cta:hover { background: var(--brass); color: #fff; }
-    .cta.small { padding: 8px 16px; font-size: .9rem; }
+    .cta.small { padding: 8px 16px; font-size: .9rem; color: var(--bg); }
+    .cta.light { background: var(--band-ink); color: var(--band); }
+    .cta.light:hover { background: var(--band-brass); color: #15202b; }
     .ghost { font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--brass); padding-bottom: 2px; }
 
     /* Hero */
     .hero { padding: 56px 0 40px; }
-    .pill { display: inline-flex; align-items: center; gap: 8px; font: 600 .8rem var(--mono); letter-spacing: .04em; text-transform: uppercase;
+    .hero .wrap { display: grid; grid-template-columns: 1.02fr 1fr; gap: 48px; align-items: center; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; font: 600 .78rem var(--mono); letter-spacing: .04em; text-transform: uppercase;
       color: var(--brass); background: var(--brass-soft); padding: 6px 12px; border-radius: 999px; }
     .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--good); }
-    h1 { font: 800 clamp(2.3rem, 6.4vw, 4.2rem)/1.04 var(--display); font-stretch: 92%; letter-spacing: -.015em; margin: 22px 0 18px; max-width: 16ch; }
+    h1 { font: 800 clamp(2.4rem, 5.6vw, 4rem)/1.03 var(--display); font-stretch: 92%; letter-spacing: -.015em; margin: 20px 0 18px; }
     h1 em { font-style: normal; color: var(--brass); }
-    .lede { font-size: clamp(1.08rem, 2.2vw, 1.25rem); color: var(--ink-2); max-width: 46ch; margin: 0 0 28px; }
+    .lede { font-size: clamp(1.08rem, 2vw, 1.22rem); color: var(--ink-2); max-width: 46ch; margin: 0 0 28px; }
     .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; }
-
-    /* Demo */
-    .demo { padding: 8px 0 48px; }
     .frame { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; box-shadow: 0 18px 50px rgba(15, 22, 28, .18); }
     .frame video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
-    .caption { font-size: .9rem; color: var(--ink-2); margin-top: 10px; }
+    .caption { font-size: .88rem; color: var(--ink-2); margin: 10px 0 0; }
+    .nda-note { display: flex; gap: 8px; align-items: center; margin: 18px 0 0; font-size: .92rem; color: var(--ink-2); }
+    .nda-note svg { flex: none; width: 15px; height: 15px; color: var(--brass); }
 
-    /* Three things */
-    .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-top: 8px; padding-bottom: 48px; }
-    .three div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
-    .three h3 { font: 700 1.1rem var(--display); margin: 0 0 6px; }
-    .three p { margin: 0; color: var(--ink-2); font-size: .98rem; }
-    .three.four { grid-template-columns: repeat(4, 1fr); }
-    @media (max-width: 1000px) { .three.four { grid-template-columns: 1fr 1fr; } }
-
-    /* Terminal */
-    .term-wrap { padding: 0 0 48px; }
-    .term-wrap h2, .beta h2 { font: 800 clamp(1.5rem, 3.4vw, 2rem)/1.15 var(--display); margin: 0 0 14px; }
-    .term { background: var(--term-bg); color: var(--term-ink); border-radius: 12px; padding: 18px 20px; font: 14px/1.7 var(--mono);
-      overflow-x: auto; white-space: pre; border: 1px solid rgba(231, 236, 239, .08); }
-    .term .p { color: var(--term-dim); } .term .x { color: #ef6f5f; } .term .ok { color: #4cc483; } .term .b { font-weight: 600; }
-    .stack { color: var(--ink-2); font-size: .95rem; margin-top: 14px; }
+    /* Works with */
+    .stackbar { padding: 8px 0 44px; }
+    .stackbar p { margin: 0 0 12px; font-size: .9rem; color: var(--ink-2); text-align: center; }
+    .stackbar ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .stackbar li { font: 600 .88rem var(--mono); padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-2); }
 
     /* Real incidents */
-    .incidents { padding: 8px 0 40px; }
-    .incidents h2 { font: 800 clamp(1.4rem, 3vw, 1.8rem)/1.2 var(--display); margin: 0 0 6px; }
-    .incidents .sub { color: var(--ink-2); margin: 0 0 18px; }
+    .incidents { padding: 48px 0; border-top: 1px solid var(--line); }
+    .incidents h2 { font-size: clamp(1.5rem, 3.2vw, 2rem); }
+    .incidents .sub { margin-bottom: 18px; }
     .incidents ol { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .incidents li { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--brass); border-radius: 12px; padding: 16px 18px; color: var(--ink-2); font-size: .97rem; }
     .incidents li b { display: block; color: var(--ink); margin-bottom: 4px; }
     .incidents li a { color: var(--ink-2); font-size: .85rem; }
     .incidents .stat { margin: 18px 0 0; color: var(--ink-2); font-size: .97rem; }
-    @media (max-width: 760px) { .incidents ol { grid-template-columns: 1fr; } }
+
+    /* The loop: a dark band with tabs */
+    .loop { background: var(--band); color: var(--band-ink); padding: 72px 0; }
+    .loop .eyebrow { color: var(--band-brass); }
+    .loop .sub { color: var(--band-ink-2); }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 0; }
+    .tabs button { font: 700 .95rem var(--body); color: var(--band-ink-2); background: transparent; border: 1px solid var(--band-line); border-radius: 999px; padding: 9px 16px; cursor: pointer; min-height: 44px; }
+    .tabs button[aria-selected="true"] { background: var(--band-ink); color: var(--band); border-color: var(--band-ink); }
+    .tabs button span { font: 600 .75rem var(--mono); color: var(--band-brass); margin-right: 6px; }
+    .tabs button[aria-selected="true"] span { color: #9a6418; }
+    .panel { display: grid; grid-template-columns: 1fr 1.15fr; gap: 40px; align-items: center; background: var(--band-2); border: 1px solid var(--band-line); border-radius: 16px; padding: 32px; }
+    .panel[hidden] { display: none; }
+    .panel h3 { font: 800 clamp(1.4rem, 2.6vw, 1.8rem)/1.15 var(--display); margin: 0 0 12px; }
+    .panel p { color: var(--band-ink-2); margin: 0 0 16px; }
+    .panel ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .panel li { padding-left: 22px; position: relative; color: var(--band-ink); }
+    .panel li::before { content: ""; position: absolute; left: 0; top: .72em; width: 10px; height: 2px; background: var(--band-brass); }
+    .js .panel + .panel { margin-top: 0; }
+    .no-js .panel + .panel { margin-top: 16px; }
+    .term { background: var(--term-bg); color: var(--term-ink); border-radius: 12px; padding: 18px 20px; font: 13.5px/1.7 var(--mono);
+      overflow-x: auto; white-space: pre; border: 1px solid rgba(231, 236, 239, .10); margin: 0; }
+    .term .p { color: var(--term-dim); } .term .x { color: #ef6f5f; } .term .ok { color: #4cc483; } .term .b { font-weight: 600; } .term .w { color: #f0b54a; }
+
+    /* Facts */
+    .facts { padding: 56px 0; }
+    .facts ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .facts li { border-top: 2px solid var(--brass); padding-top: 14px; color: var(--ink-2); font-size: .95rem; }
+    .facts b { display: block; font: 800 clamp(1.5rem, 3vw, 2rem)/1.1 var(--display); color: var(--ink); margin-bottom: 6px; }
+
+    /* Cards */
+    .cards { padding: 56px 0; border-top: 1px solid var(--line); }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+    .card svg { width: 26px; height: 26px; color: var(--brass); margin-bottom: 12px; }
+    .card h3 { font: 700 1.08rem var(--display); margin: 0 0 6px; }
+    .card p { margin: 0; color: var(--ink-2); font-size: .96rem; }
+
+    /* Trust */
+    .trust { padding: 56px 0; border-top: 1px solid var(--line); }
+    .trust .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .trust .card h3 { font: 700 .8rem var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--brass); margin: 0 0 12px; }
+    .trust ul { margin: 0; padding-left: 18px; color: var(--ink-2); display: grid; gap: 8px; }
+    .trust li b { color: var(--ink); }
 
     /* Beta */
-    .beta { padding: 40px 0 56px; border-top: 1px solid var(--line); }
-    .deal { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 26px; }
-    .deal div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+    .beta { padding: 56px 0; border-top: 1px solid var(--line); }
+    .deal { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 28px; }
     .deal h3 { font: 700 .8rem var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--brass); margin: 0 0 8px; }
     .deal ul { margin: 0; padding-left: 18px; color: var(--ink-2); }
-    .nda-note { display: flex; gap: 8px; align-items: center; margin: 14px 0 0; font-size: .92rem; color: var(--ink-2); }
-    .nda-note svg { flex: none; width: 15px; height: 15px; color: var(--brass); }
-    .join { list-style: none; counter-reset: j; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0; margin: 0 0 26px; }
+    .join { list-style: none; counter-reset: j; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0; margin: 0 0 28px; }
     .join li { counter-increment: j; border-top: 2px solid var(--line); padding-top: 12px; color: var(--ink-2); font-size: .95rem; }
     .join li::before { content: counter(j); display: block; font: 700 .8rem var(--mono); color: var(--brass); margin-bottom: 4px; }
     .join li b { display: block; color: var(--ink); }
     .join li.key { border-top-color: var(--brass); }
-    .founder { display: flex; gap: 14px; align-items: flex-start; margin-top: 34px; color: var(--ink-2); font-size: .98rem; max-width: 62ch; }
-    .founder svg { flex: none; width: 16px; height: 24px; margin-top: 4px; color: var(--ink); }
-    .founder b { color: var(--ink); }
+    .steps-h { font: 700 .8rem var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--brass); margin: 0 0 10px; }
+
+    /* Founder */
+    .founder { padding: 56px 0; border-top: 1px solid var(--line); }
+    .founder figure { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: start; max-width: 860px; }
+    .founder svg { width: 22px; height: 33px; color: var(--ink); margin-top: 6px; }
+    .founder blockquote { margin: 0; font: 700 clamp(1.3rem, 2.8vw, 1.75rem)/1.3 var(--display); font-stretch: 96%; }
+    .founder figcaption { margin-top: 14px; color: var(--ink-2); }
+    .founder figcaption b { color: var(--ink); }
+
+    /* FAQ */
+    .faq { padding: 56px 0; border-top: 1px solid var(--line); }
+    .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 20px; margin: 0 0 10px; max-width: 860px; }
+    .faq summary { cursor: pointer; font-weight: 700; padding: 16px 0; min-height: 44px; list-style-position: inside; }
+    .faq details p { margin: 0 0 16px; color: var(--ink-2); }
+
+    /* Final call to action */
+    .final { background: var(--band); color: var(--band-ink); padding: 64px 0; text-align: center; }
+    .final h2 { margin-bottom: 10px; }
+    .final p { color: var(--band-ink-2); margin: 0 auto 26px; max-width: 52ch; }
 
     footer { border-top: 1px solid var(--line); padding: 22px 0 32px; font-size: .88rem; color: var(--ink-2); }
     footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
     footer a { color: var(--ink-2); }
 
+    @media (max-width: 960px) {
+      .hero .wrap, .panel { grid-template-columns: 1fr; }
+      .grid4, .facts ul { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 760px) {
-      .three, .deal, .three.four { grid-template-columns: 1fr; }
-      .join { grid-template-columns: 1fr 1fr; }
       header nav .hide-sm { display: none; }
-      .hero { padding-top: 32px; }
-      .term { font-size: 12.5px; }
+      .hero { padding-top: 28px; }
+      .incidents ol, .trust .cols, .deal, .grid4, .facts ul { grid-template-columns: 1fr; }
+      .join { grid-template-columns: 1fr 1fr; }
+      .panel { padding: 20px; }
+      .term { font-size: 12px; }
     }
   </style>
 </head>
 
-<body>
+<body class="no-js">
   <header>
     <div class="wrap">
       <a class="mark" href="./" aria-label="Plumbline home">
@@ -149,7 +209,10 @@
         Plumbline
       </a>
       <nav aria-label="Site">
-        <a href="#demo" class="hide-sm">Demo</a>
+        <a href="#loop" class="hide-sm">Product</a>
+        <a href="#trust" class="hide-sm">Security</a>
+        <a href="#beta" class="hide-sm">Beta</a>
+        <a href="#faq" class="hide-sm">FAQ</a>
         <a href="tour.html" class="hide-sm">Full tour</a>
         <a class="cta small" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request access</a>
       </nav>
@@ -159,14 +222,35 @@
   <main>
     <section class="hero">
       <div class="wrap">
-        <span class="pill"><span class="dot" aria-hidden="true"></span>Private beta · onboarding a few teams</span>
-        <h1>Agents don't throw exceptions. <em>Plumbline does.</em></h1>
-        <p class="lede">Your agent said “done.” Plumbline checks whether it was, stops it before it acts on a bad call, and turns every incident into a fix you approve.</p>
-        <div class="actions">
-          <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
-          <a class="ghost" href="#demo">Watch the 2-minute demo</a>
+        <div>
+          <span class="pill"><span class="dot" aria-hidden="true"></span>Private beta · onboarding a few teams</span>
+          <h1>Agents don't throw exceptions. <em>Plumbline does.</em></h1>
+          <p class="lede">Your agent said “done.” Plumbline checks whether it was, stops it before it acts on a bad call, and turns every incident into a fix you approve.</p>
+          <div class="actions">
+            <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
+            <a class="ghost" href="#demo">Watch the 2-minute demo</a>
+          </div>
+          <p class="nda-note"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Invite only. Approved teams sign a short mutual NDA online before getting access. <a href="#beta">How joining works</a></span></p>
         </div>
-        <p class="nda-note"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>Invite only. Approved teams sign a short mutual NDA online before getting access. <a href="#beta">How joining works</a></span></p>
+        <div id="demo">
+          <div class="frame">
+            <video controls playsinline preload="metadata" poster="media/plumbline-demo-poster.jpg"
+              aria-label="Plumbline demo: an alert with its likely cause, a person approving a risky refund, and a regression caught before it ships">
+              <source src="media/plumbline-demo.mp4" type="video/mp4">
+              <a href="media/plumbline-demo.mp4">Download the demo video</a>
+            </video>
+          </div>
+          <p class="caption">Two minutes on the real dashboard, narrated by the founder.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="stackbar" aria-label="Works with">
+      <div class="wrap">
+        <p>Works alongside the stack you already have. Keep your tracing; Plumbline checks the outcome.</p>
+        <ul>
+          <li>OpenAI Agents SDK</li><li>LangGraph</li><li>CrewAI</li><li>Vercel AI SDK</li><li>OpenTelemetry</li><li>MCP</li><li>Slack</li><li>Email</li>
+        </ul>
       </div>
     </section>
 
@@ -183,72 +267,194 @@
       </div>
     </section>
 
-    <section class="demo" id="demo">
+    <section class="loop" id="loop" aria-labelledby="loop-h">
       <div class="wrap">
-        <div class="frame">
-          <video controls playsinline preload="metadata" poster="media/plumbline-demo-poster.jpg"
-            aria-label="Plumbline demo: an alert with its likely cause, a person approving a risky refund, and a regression caught before it ships">
-            <source src="media/plumbline-demo.mp4" type="video/mp4">
-            <a href="media/plumbline-demo.mp4">Download the demo video</a>
-          </video>
+        <p class="eyebrow">The reliability loop</p>
+        <h2 id="loop-h">From “done” to proof, in one loop.</h2>
+        <p class="sub">Five steps, most of them automatic. Each one works on its own; together they close the loop.</p>
+
+        <div class="tabs" role="tablist" aria-label="The reliability loop" hidden>
+          <button role="tab" id="t-connect" aria-controls="p-connect" aria-selected="true"><span>01</span>Connect</button>
+          <button role="tab" id="t-check" aria-controls="p-check" aria-selected="false" tabindex="-1"><span>02</span>Check</button>
+          <button role="tab" id="t-stop" aria-controls="p-stop" aria-selected="false" tabindex="-1"><span>03</span>Stop</button>
+          <button role="tab" id="t-fix" aria-controls="p-fix" aria-selected="false" tabindex="-1"><span>04</span>Fix</button>
+          <button role="tab" id="t-prove" aria-controls="p-prove" aria-selected="false" tabindex="-1"><span>05</span>Prove</button>
         </div>
-        <p class="caption">Two minutes on the real dashboard, narrated by the founder.</p>
-      </div>
-    </section>
 
-    <section aria-label="What it does">
-      <div class="wrap three four">
-      <div>
-        <h3>Stop it before it acts</h3>
-        <p>Risky actions are checked first. When it matters, a person decides.</p>
-      </div>
-      <div>
-        <h3>See what nobody checked</h3>
-        <p>An estimate of the false “done”s across every run, not just the few you review.</p>
-      </div>
-      <div>
-        <h3>Fixes you approve</h3>
-        <p>Every incident becomes a test and a pull request. You merge it, or you don’t.</p>
-      </div>
-      <div>
-        <h3>Proof for auditors</h3>
-        <p>A signed reliability report per agent, ready for the questions that come later.</p>
-      </div>
-      </div>
-    </section>
-
-    <section class="term-wrap">
-      <div class="wrap">
-        <h2>A bad refund, held before it happened.</h2>
-        <div class="term" role="img" aria-label="Plumbline holds a 500 dollar refund for a person because it is over the limit and more than the order was worth"><span class="p">agent</span>  <span class="b">refund.issue</span>  $500.00  order A-1093
-<span class="p">plumbline</span>  <span class="x b">HELD FOR A PERSON</span>  (4 ms)
-  <span class="x">✗</span> amount     $500.00 is over the $200.00 limit
-  <span class="x">✗</span> evidence   refund ($500.00) is more than the order total ($40.00)
-  <span class="ok">✓</span> claim      the agent reports the task done
-  <span class="ok">✓</span> run        no failed steps, no guardrail block
-
-  → #support-oncall: approve, edit or reject   due in 10 min
-
-<span class="p">later</span>   Plumbline estimates 31 false “done”s this week in runs nobody reviewed.
-        3 incidents became fixes; you merged 2.</div>
-        <p class="stack">Works alongside the stack you already have: OpenAI Agents SDK, LangGraph, CrewAI, Vercel AI SDK, OpenTelemetry and MCP. Keep your tracing; Plumbline checks the outcome. Alerts in Slack or email.</p>
-      </div>
-    </section>
-
-    <section class="beta" id="beta">
-      <div class="wrap">
-        <h2>Join the private beta.</h2>
-        <p class="lede" style="margin-bottom:0">For engineers with an AI agent in production, or about to be.</p>
-        <div class="deal">
+        <div class="panel" role="tabpanel" id="p-connect" aria-labelledby="t-connect">
           <div>
-            <h3>You get</h3>
+            <h3>Connect in minutes, often without code.</h3>
+            <p>If your agents already export traces, point them at Plumbline. Nothing to rebuild.</p>
             <ul>
-              <li>Free for the whole beta</li>
-              <li>Setup with the founder, in 30 minutes</li>
-              <li>A real say in what we build next</li>
+              <li>OpenTelemetry from the frameworks you use today</li>
+              <li>Or a few lines with the TypeScript or Python client</li>
+              <li>Set up with the founder on a 30-minute call</li>
             </ul>
           </div>
+<pre class="term" role="img" aria-label="An agent's runs arriving in Plumbline"><span class="p">agent</span>   support-agent · production
+<span class="p">runs</span>    1,284 today · 3.1 s p95 · $0.004 per task
+<span class="p">steps</span>   tool calls, guardrails, approvals
+<span class="ok">✓</span> connected · first data in under a minute</pre>
+        </div>
+
+        <div class="panel" role="tabpanel" id="p-check" aria-labelledby="t-check">
           <div>
+            <h3>Check what actually happened.</h3>
+            <p>Plumbline compares what the agent claimed with what really happened, on every run.</p>
+            <ul>
+              <li>False completions, silent failures and drift, per agent</li>
+              <li>A model of your own verified runs estimates what nobody reviewed</li>
+              <li>Every alert names the likely cause: the prompt, the model, the deploy</li>
+            </ul>
+          </div>
+<pre class="term" role="img" aria-label="An alert: false completions rose after a prompt change"><span class="w b">ALERT</span>  false “done” rate 2.1% → 9.4%
+<span class="p">agent</span>  booking-agent · since 14:05
+<span class="p">likely cause</span>  prompt v12 (deployed 14:02)
+        step <span class="b">confirm_slot</span> failing 31 of 40
+<span class="p">estimate</span>  ~120 unreviewed runs affected</pre>
+        </div>
+
+        <div class="panel" role="tabpanel" id="p-stop" aria-labelledby="t-stop">
+          <div>
+            <h3>Stop it before it acts.</h3>
+            <p>The agent asks before a refund, a booking or an email. Plumbline answers in milliseconds.</p>
+            <ul>
+              <li>Go ahead, stop, or a person decides</li>
+              <li>Approve or reject from your phone, in one tap</li>
+              <li>Start in shadow mode to see what it would have held</li>
+            </ul>
+          </div>
+<pre class="term" role="img" aria-label="Plumbline holds a 500 dollar refund for a person"><span class="p">agent</span>  <span class="b">refund.issue</span>  $500.00  order A-1093
+<span class="p">plumbline</span>  <span class="x b">HELD FOR A PERSON</span>  (4 ms)
+  <span class="x">✗</span> amount    $500.00 is over the $200.00 limit
+  <span class="x">✗</span> evidence  refund is more than the order ($40.00)
+  <span class="ok">✓</span> claim     the agent reports the task done
+  → #support-oncall: approve, edit or reject</pre>
+        </div>
+
+        <div class="panel" role="tabpanel" id="p-fix" aria-labelledby="t-fix">
+          <div>
+            <h3>Turn incidents into fixes you approve.</h3>
+            <p>The runs behind an incident become tests. A fix is proposed, checked against them, and opened as a pull request.</p>
+            <ul>
+              <li>Regression cases from real production failures</li>
+              <li>Fixes verified before anyone looks at them</li>
+              <li>A person merges. Plumbline never does.</li>
+            </ul>
+          </div>
+<pre class="term" role="img" aria-label="Autopilot scorecard: incidents turned into fixes"><span class="p">this month</span>
+  incidents taken on        16
+  verified fixes proposed   14
+  <span class="ok">✓</span> approved by your team  12
+  <span class="ok">✓</span> confirmed fixed          9
+<span class="p">median</span>  alert → pull request  2.4 h</pre>
+        </div>
+
+        <div class="panel" role="tabpanel" id="p-prove" aria-labelledby="t-prove">
+          <div>
+            <h3>Prove it to whoever asks.</h3>
+            <p>A signed reliability report per agent, for your board, auditors, regulators or insurers.</p>
+            <ul>
+              <li>Outcomes with confidence intervals, human oversight, held actions</li>
+              <li>Mapped to EU AI Act, NIST AI RMF, ISO/IEC 42001 and SOC 2 controls</li>
+              <li>Anyone can verify it has not been changed</li>
+            </ul>
+          </div>
+<pre class="term" role="img" aria-label="Verifying a signed reliability report"><span class="p">report</span>  support-agent · Oct 2026
+  verified success   96.8%  (95% CI 95.9–97.5)
+  held for a person  41 · approved 33
+<span class="ok">✓</span> sha256 matches
+<span class="ok">✓</span> signature valid · key 3f9c…
+<span class="ok b">VALID</span></pre>
+        </div>
+        <p class="caption" style="color:var(--band-ink-2);margin-top:16px">Example output. Figures are illustrative.</p>
+      </div>
+    </section>
+
+    <section class="facts" aria-label="At a glance">
+      <div class="wrap">
+        <ul>
+          <li><b>Milliseconds</b>to answer the agent before it acts</li>
+          <li><b>30 minutes</b>from invite to your first agent connected</li>
+          <li><b>Zero code</b>to start, if you already export traces</li>
+          <li><b>Signed</b>reports anyone can verify, without trusting us</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="cards" aria-labelledby="fit-h">
+      <div class="wrap">
+        <p class="eyebrow">Fits how you build</p>
+        <h2 id="fit-h">Add it. Don’t rebuild around it.</h2>
+        <p class="sub">Plumbline sits next to your agents, not inside them.</p>
+        <div class="grid4">
+          <div class="card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+            <h3>Any model</h3>
+            <p>OpenAI, Anthropic, Google, open weights. Switch models without switching tools.</p>
+          </div>
+          <div class="card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+            <h3>Any framework</h3>
+            <p>OpenTelemetry in, so whatever you build agents with already speaks to it.</p>
+          </div>
+          <div class="card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg>
+            <h3>Your call when it’s down</h3>
+            <p>You choose whether a risky action waits or goes ahead if Plumbline can’t be reached.</p>
+          </div>
+          <div class="card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/></svg>
+            <h3>Alerts where you work</h3>
+            <p>Slack, email or a webhook. Related alerts arrive as one message, not a dozen pings.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust" id="trust" aria-labelledby="trust-h">
+      <div class="wrap">
+        <p class="eyebrow">Security and data</p>
+        <h2 id="trust-h">Built for what your agents handle.</h2>
+        <p class="sub">Your customers’ conversations are not ours to keep. Plumbline is built that way from the start.</p>
+        <div class="cols">
+          <div class="card">
+            <h3>Your data</h3>
+            <ul>
+              <li><b>Opt-in.</b> Inputs and outputs are kept only if you turn it on, and redacted first.</li>
+              <li><b>Encrypted.</b> What an agent passes for a person to decide is stored encrypted.</li>
+              <li><b>Isolated.</b> Every team has its own workspace; nothing is shared between them.</li>
+              <li><b>Mutual NDA</b> with every beta team, before any data is sent.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Access and audit</h3>
+            <ul>
+              <li><b>Roles.</b> Owner, admin, member and viewer, with invite-only accounts.</li>
+              <li><b>Scoped keys.</b> Separate keys to send data, read it, and administer.</li>
+              <li><b>Audit log.</b> Every decision, approval and change, with who made it.</li>
+              <li><b>Signed records.</b> Exports and reports can be checked by anyone.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="beta" id="beta" aria-labelledby="beta-h">
+      <div class="wrap">
+        <p class="eyebrow">Private beta</p>
+        <h2 id="beta-h">Join the private beta.</h2>
+        <p class="sub">For engineers and founders with an AI agent in production, or about to be.</p>
+        <div class="deal">
+          <div class="card">
+            <h3>You get</h3>
+            <ul>
+              <li>Setup with the founder, in 30 minutes</li>
+              <li>A direct line, and a real say in what we build next</li>
+              <li>No cost for the whole beta</li>
+            </ul>
+          </div>
+          <div class="card">
             <h3>We ask</h3>
             <ul>
               <li>One real agent, for a few weeks</li>
@@ -257,7 +463,7 @@
             </ul>
           </div>
         </div>
-        <h3 style="font:700 .8rem var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--brass);margin:0 0 10px">How joining works</h3>
+        <p class="steps-h">How joining works</p>
         <ol class="join">
           <li><b>Request access</b>Two-minute form.</li>
           <li><b>Quick intro</b>We check it's a fit, usually within a few days.</li>
@@ -265,10 +471,53 @@
           <li><b>Get access</b>Setup with Shama in 30 minutes.</li>
         </ol>
         <a class="cta" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
-        <div class="founder">
+      </div>
+    </section>
+
+    <section class="founder" aria-label="Why it exists">
+      <div class="wrap">
+        <figure>
           <svg viewBox="0 0 18 26" aria-hidden="true"><line x1="9" y1="0" x2="9" y2="12" stroke="currentColor" stroke-width="1.6" /><path d="M4 12 h10 l-5 13 z" fill="var(--brass)" /></svg>
-          <p style="margin:0">Built by <b>Shama Keskar</b>, three-time technical cofounder and CTO, ex-Google, Amazon and LinkedIn. “Our agents kept saying ‘done’ when they weren’t. Nothing in our logs caught it, so I built Plumbline.”</p>
-        </div>
+          <div>
+            <blockquote>“Our agents kept saying ‘done’ when they weren’t. Nothing in our logs caught it, so I built Plumbline.”</blockquote>
+            <figcaption><b>Shama Keskar</b>, founder. Three-time technical cofounder and CTO; 16 years at Google, LinkedIn and Amazon.</figcaption>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <section class="faq" id="faq" aria-labelledby="faq-h">
+      <div class="wrap">
+        <p class="eyebrow">Questions</p>
+        <h2 id="faq-h">What teams ask first.</h2>
+        <details>
+          <summary>Do we have to change our code?</summary>
+          <p>Not to start. If your agents already export OpenTelemetry traces, you point them at Plumbline with two settings. Stopping risky actions takes one check in front of each action, usually a few lines, and we add it with you on the setup call.</p>
+        </details>
+        <details>
+          <summary>Does it replace our tracing or evals?</summary>
+          <p>No. Keep the tools you use to build and debug. Plumbline answers a different question: did the agent actually get the job done in production, and should this action go ahead.</p>
+        </details>
+        <details>
+          <summary>What do you store, and where?</summary>
+          <p>Run records (status, timing, cost, steps) by default. Inputs and outputs only if you turn that on, redacted and encrypted. The beta is hosted in the US, with each team in its own workspace.</p>
+        </details>
+        <details>
+          <summary>What if Plumbline is unreachable when an agent asks?</summary>
+          <p>You decide per action: wait (the safe default for refunds and anything irreversible) or go ahead. Either way, the agent gets an answer within the time you set.</p>
+        </details>
+        <details>
+          <summary>Why the NDA?</summary>
+          <p>You will show us real agent behaviour, and we will show you unreleased product. A short mutual NDA protects both, and takes a few minutes to e-sign.</p>
+        </details>
+      </div>
+    </section>
+
+    <section class="final" aria-labelledby="final-h">
+      <div class="wrap">
+        <h2 id="final-h">Know your agent did the job.</h2>
+        <p>A few teams at a time, set up with the founder. Bring one agent; leave with the failures nobody saw.</p>
+        <a class="cta light" href="https://forms.gle/v61cAjbzKYTn7Ci59" target="_blank" rel="noopener">Request beta access</a>
       </div>
     </section>
   </main>
@@ -279,6 +528,35 @@
       <span>© 2026 Styled By and Shama AI Ventures LLC</span>
     </div>
   </footer>
-</body>
 
+  <script>
+    // Tabs for the reliability loop. Without JavaScript every step stays visible, one after another.
+    (function () {
+      document.body.classList.replace('no-js', 'js');
+      var list = document.querySelector('.tabs');
+      if (!list) return;
+      var tabs = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
+      list.hidden = false;
+      function select(tab, focus) {
+        tabs.forEach(function (t) {
+          var on = t === tab;
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+          t.tabIndex = on ? 0 : -1;
+          document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        });
+        if (focus) tab.focus();
+      }
+      tabs.forEach(function (t, i) {
+        t.addEventListener('click', function () { select(t, false); });
+        t.addEventListener('keydown', function (e) {
+          var next = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : null;
+          if (next === null) return;
+          e.preventDefault();
+          select(tabs[(next + tabs.length) % tabs.length], true);
+        });
+      });
+      select(tabs[0], false);
+    })();
+  </script>
+</body>
 </html>
