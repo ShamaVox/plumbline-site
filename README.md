@@ -2,12 +2,10 @@
 
 Copyright 2026 Styled By and Shama AI Ventures LLC
 
-Quality monitoring for AI agents in production.
+Agents don't throw exceptions. Plumbline does.
 
-Plumbline catches the failures that never throw an error: an agent reporting "done" when the job wasn't done, quality
-drifting for weeks, and risky actions nobody approved. When quality slips, it tells your team in Slack or email and
-names the likely cause. When an agent shouldn't act alone, it asks a person and hands the agent their decision. And it
-blocks regressions in CI before they ship.
+Plumbline checks that AI agents actually got the job done, stops risky actions before they happen, turns every
+incident into a fix you approve, and keeps signed proof of it all. Private beta, onboarding a few teams.
 
 **Website and 2-minute demo:** https://plumbline.shamakeskar.com
 
